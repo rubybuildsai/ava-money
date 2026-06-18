@@ -7,1064 +7,334 @@
   <meta name="description" content="Ava financial agent demo with Agent Observatory." />
   <style>
     :root{
-      --lime:#D8FF3E;
-      --lime-soft:#F4FFD7;
-      --ink:#070A09;
-      --muted:#6B716E;
-      --line:#E7EADF;
+      --lime:#C9F938;
+      --lime-soft:#F4FBE9;
+      --ink:#080A09;
+      --muted:#5F6662;
+      --line:#E8EBE4;
       --panel:#FFFFFF;
-      --soft:#FAFBF7;
-      --green:#148A38;
-      --orange:#FF6B26;
-      --blue:#2F80ED;
-      --purple:#8B5CF6;
-      --shadow:0 18px 45px rgba(7,10,9,.07);
+      --soft:#FAFAF7;
+      --green:#0B8F2F;
+      --orange:#FFB000;
+      --shadow:0 8px 22px rgba(0,0,0,.035);
     }
     *{box-sizing:border-box}
     body{
       margin:0;
-      background:
-        radial-gradient(circle at 10% 0%, rgba(216,255,62,.28), transparent 24%),
-        #fff;
+      background:#FAFAF7;
       color:var(--ink);
       font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Inter","Segoe UI",sans-serif;
       -webkit-font-smoothing:antialiased;
     }
     .page{
-      min-height:100vh;
+      height:100vh;
+      overflow:hidden;
       display:grid;
-      grid-template-columns:minmax(420px, .95fr) minmax(460px, 1.05fr);
-      gap:20px;
-      padding:22px;
+      grid-template-columns:minmax(460px,.92fr) minmax(520px,1.08fr);
+      gap:12px;
+      padding:12px;
     }
     .app,.observatory{
-      background:rgba(255,255,255,.92);
+      height:calc(100vh - 24px);
+      background:#fff;
       border:1px solid var(--line);
-      border-radius:28px;
+      border-radius:18px;
       box-shadow:var(--shadow);
       overflow:hidden;
-      min-height:calc(100vh - 44px);
     }
-
-    /* Ava app */
     .app{
       display:flex;
       flex-direction:column;
-      padding:26px;
+      padding:22px;
     }
     .app-header,.obs-header{
       display:flex;
+      align-items:center;
       justify-content:space-between;
-      align-items:flex-start;
       gap:16px;
+    }
+    .app-title{
+      display:flex;
+      align-items:center;
+      gap:18px;
+      min-width:0;
     }
     .brand{
       display:flex;
       align-items:center;
       gap:12px;
-      font-size:34px;
+      font-size:32px;
       font-weight:850;
-      letter-spacing:-.06em;
-      line-height:1;
+      letter-spacing:-.055em;
+      white-space:nowrap;
     }
     .brand-dot{
-      width:38px;height:38px;border-radius:50%;
-      background:var(--lime);
-      position:relative;
-      box-shadow:0 0 36px rgba(216,255,62,.72);
+      width:32px;height:32px;border-radius:50%;
+      background:#fff;
+      border:2px solid var(--lime);
       flex:0 0 auto;
     }
-    .brand-dot:after{
-      content:"";
-      position:absolute;
-      width:10px;height:10px;border-radius:50%;
-      background:var(--ink);
-      left:50%;top:50%;
-      transform:translate(-50%,-50%);
-    }
     .tagline{
-      color:#3E4441;
-      font-size:15px;
-      margin-top:7px;
-      letter-spacing:-.012em;
+      font-size:14px;
+      color:#3D4440;
+      white-space:nowrap;
+      letter-spacing:-.01em;
     }
     .voice-menu{
+      position:relative;
       display:flex;
       align-items:center;
-      gap:10px;
+      gap:9px;
       border:1px solid var(--line);
       border-radius:999px;
-      padding:8px 13px 8px 8px;
+      padding:7px 12px 7px 7px;
       background:white;
-      box-shadow:0 10px 22px rgba(0,0,0,.04);
+      box-shadow:0 4px 14px rgba(0,0,0,.035);
       cursor:pointer;
+      font-weight:800;
       user-select:none;
-      font-weight:750;
-      position:relative;
+      flex:0 0 auto;
     }
     .speaker-icon{
-      width:34px;height:34px;border-radius:50%;
-      background:var(--lime);
+      width:30px;height:30px;border-radius:50%;
+      background:var(--lime-soft);
+      color:var(--green);
       display:grid;
       place-items:center;
     }
-    .speaker-icon svg{width:18px;height:18px}
+    .speaker-icon svg{width:17px;height:17px}
     .voice-dropdown{
       position:absolute;
       right:0;
-      top:48px;
-      width:245px;
-      background:white;
+      top:44px;
+      width:250px;
+      background:#fff;
       border:1px solid var(--line);
       border-radius:18px;
-      box-shadow:0 20px 50px rgba(0,0,0,.12);
-      padding:8px;
-      z-index:10;
+      box-shadow:0 18px 40px rgba(0,0,0,.12);
+      padding:12px;
+      z-index:30;
       display:none;
     }
     .voice-menu.open .voice-dropdown{display:block}
-    .voice-option{
-      display:flex;
-      gap:10px;
-      align-items:center;
-      padding:11px 12px;
-      border-radius:13px;
-      font-size:14px;
-      font-weight:650;
-    }
-    .voice-option:hover{background:#F4F6EF}
-    .voice-sub{display:block;color:var(--muted);font-weight:450;font-size:12px;margin-top:2px}
-    .divider{height:1px;background:var(--line);margin:6px 0}
-
-    .suggestions{
-      padding-top:28px;
-    }
-    .section-title{
+    .voice-dropdown-title{
       font-size:15px;
-      font-weight:750;
-      margin:0 0 13px;
-      letter-spacing:-.012em;
+      font-weight:850;
+      padding:6px 8px 10px;
     }
-    .suggestion-grid{
+    .voice-choice{
       display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:12px;
+      grid-template-columns:22px 1fr;
+      gap:10px;
+      align-items:start;
+      padding:12px 10px;
+      border-radius:15px;
+      font-size:15px;
+      font-weight:800;
     }
+    .voice-choice:hover{background:#F4F6EF}
+    .voice-choice.active{background:#F7FBEF}
+    .radio{
+      width:16px;height:16px;border-radius:50%;
+      border:2px solid #9AA09C;
+      margin-top:2px;
+      position:relative;
+    }
+    .voice-choice.active .radio{border-color:var(--ink);background:var(--lime)}
+    .voice-choice.active .radio:after{
+      content:"";position:absolute;inset:3px;border-radius:50%;background:var(--ink);
+    }
+    .voice-desc{display:block;color:var(--muted);font-weight:520;font-size:13px;margin-top:3px}
+    .voice-current{display:inline-block;margin-top:7px;color:var(--green);font-weight:800;font-size:12px}
+    .suggestions{padding-top:16px}
+    .section-title{font-size:14px;font-weight:750;margin:0 0 12px}
+    .suggestion-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
     .suggestion{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
+      min-height:74px;
+      padding:14px;
       border:1px solid var(--line);
-      background:rgba(255,255,255,.8);
-      border-radius:18px;
-      padding:14px 16px;
-      min-height:78px;
-      cursor:pointer;
-      transition:.15s ease;
-      font-size:16px;
-      line-height:1.28;
-      letter-spacing:-.02em;
-    }
-    .suggestion:hover{
-      transform:translateY(-1px);
-      background:var(--lime-soft);
-      border-color:#D7E9A2;
-    }
-    .s-left{display:flex;align-items:center;gap:13px}
-    .s-icon{
-      width:42px;height:42px;border-radius:50%;
-      background:#F0F9D8;
-      color:#6BA312;
-      display:grid;
-      place-items:center;
-      flex:0 0 auto;
-    }
-    .chev{font-size:24px;line-height:1;color:#111}
-
-    .money-event{
-      margin-top:20px;
-      border:1px solid var(--line);
-      border-radius:18px;
-      padding:16px;
+      border-radius:16px;
       background:#fff;
       display:flex;
       align-items:center;
       justify-content:space-between;
+      gap:12px;
+      cursor:pointer;
+      transition:.14s ease;
+      font-size:15px;
+      line-height:1.28;
     }
-    .money-label{
-      color:var(--muted);
-      font-size:12px;
-      font-weight:850;
-      letter-spacing:.08em;
-      text-transform:uppercase;
-      margin-bottom:5px;
-    }
-    .amount{
-      font-size:32px;
-      font-weight:850;
-      letter-spacing:-.055em;
-    }
-    .pill{
-      background:var(--lime);
-      border-radius:10px;
-      padding:8px 11px;
-      font-size:13px;
+    .suggestion:hover{background:var(--lime-soft);border-color:#DDECB0;transform:translateY(-1px)}
+    .s-left{display:flex;align-items:center;gap:12px}
+    .s-icon{
+      width:40px;height:40px;border-radius:50%;
+      background:#EEF8D9;color:var(--green);
+      display:grid;place-items:center;flex:0 0 auto;
       font-weight:800;
     }
-
-    .chat{
+    .chev{font-size:22px;color:#111}
+    .money-event{
       margin-top:20px;
+      padding:12px 14px;
+      border:1px solid var(--line);
+      border-radius:16px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      min-height:54px;
+    }
+    .money-event-main{display:flex;align-items:center;gap:10px}
+    .amount{font-size:22px;font-weight:850;letter-spacing:-.04em}
+    .amount:before{
+      content:"$";
+      display:inline-grid;
+      place-items:center;
+      width:30px;height:30px;border-radius:50%;
+      background:#EEF8D9;color:var(--green);
+      font-size:17px;margin-right:10px;font-weight:800;
+    }
+    .amount:after{
+      content:" New cash";
+      font-size:14px;
+      color:var(--muted);
+      font-weight:650;
+      margin-left:10px;
+      letter-spacing:0;
+    }
+    .pill{
+      background:#F1F8E7;color:var(--green);
+      padding:7px 12px;border-radius:999px;
+      font-size:13px;font-weight:800;
+    }
+    .chat{
+      margin-top:18px;
+      flex:1;
+      min-height:0;
+      overflow:hidden;
       display:flex;
       flex-direction:column;
-      gap:14px;
-      flex:1;
-      min-height:250px;
-      overflow:auto;
-      padding-bottom:14px;
+      gap:16px;
+      padding:0;
     }
     .msg-row{display:flex;gap:10px;align-items:flex-start}
     .msg-row.user{justify-content:flex-end}
-    .avatar{
-      width:30px;height:30px;border-radius:50%;
-      background:var(--lime);
-      position:relative;
-      flex:0 0 auto;
-      margin-top:2px;
-    }
-    .avatar:after{
-      content:"";
-      position:absolute;
-      width:8px;height:8px;border-radius:50%;
-      background:var(--ink);
-      left:50%;top:50%;
-      transform:translate(-50%,-50%);
-    }
     .message{
-      max-width:78%;
-      border:1px solid rgba(231,234,223,.65);
-      background:linear-gradient(135deg,#fff,#FAFBF5);
-      border-radius:19px;
-      padding:14px 16px;
-      line-height:1.45;
+      max-width:66%;
+      padding:18px 20px;
+      border:1px solid #EDF0E6;
+      border-radius:16px;
+      background:linear-gradient(135deg,#fff,#FAFBF7);
       font-size:15px;
-      white-space:pre-wrap;
-      box-shadow:0 10px 24px rgba(0,0,0,.04);
+      line-height:1.55;
       letter-spacing:-.01em;
+      white-space:pre-wrap;
     }
-    .msg-meta{
-      font-size:13px;
-      color:var(--muted);
-      margin-bottom:7px;
-    }
-    .msg-meta b{color:var(--ink);margin-right:10px}
     .user .message{
-      background:#F5F7FB;
-      border-color:#EDF1F8;
+      max-width:50%;
+      background:#F7F8FA;
+      border-color:#EEF0F2;
     }
-
-    .input-wrap{
-      border:1.5px solid #DDE2D1;
-      border-radius:26px;
-      background:white;
-      padding:8px 10px 8px 18px;
-      box-shadow:0 18px 50px rgba(0,0,0,.08);
-    }
-    .inputbar{
+    .msg-meta{margin:0 0 10px;font-size:0;color:transparent}
+    .msg-meta b{font-size:14px;color:var(--green);margin:0}
+    .reading-status{
       display:flex;
       align-items:center;
-      gap:10px;
+      justify-content:space-between;
+      gap:12px;
+      margin:8px 0;
+      padding:9px 12px;
+      border:1px solid var(--line);
+      border-radius:14px;
+      background:#FAFBF7;
+      color:var(--muted);
+      font-size:13px;
+      flex:0 0 auto;
     }
+    .reading-status button{
+      border:0;background:transparent;color:var(--green);
+      font-weight:800;padding:4px 6px;border-radius:8px;cursor:pointer;
+    }
+    .reading-status button:hover{background:#EEF8D9}
+    .input-wrap{
+      margin-top:8px;
+      border:1px solid #E4E7E2;
+      border-radius:16px;
+      padding:9px 12px 9px 16px;
+      box-shadow:0 8px 22px rgba(0,0,0,.045);
+      flex:0 0 auto;
+    }
+    .inputbar{display:flex;align-items:center;gap:10px}
     input{
-      flex:1;
-      border:0;
-      outline:none;
-      background:transparent;
-      color:var(--ink);
-      font-size:18px;
-      padding:15px 8px;
+      flex:1;border:0;outline:none;background:transparent;
+      font-size:15px;padding:12px 6px;color:var(--ink);
     }
     input::placeholder{color:#8A8F8C}
-    button{
-      border:0;
-      cursor:pointer;
-      font-family:inherit;
-    }
+    button{font-family:inherit;border:0;cursor:pointer}
     .wave-btn,.send-btn{
-      width:54px;height:54px;border-radius:50%;
-      display:grid;
-      place-items:center;
-      flex:0 0 auto;
-      transition:.16s ease;
+      width:46px;height:46px;border-radius:50%;
+      display:grid;place-items:center;flex:0 0 auto;
     }
-    .wave-btn{
-      background:var(--lime);
-      box-shadow:0 0 0 8px rgba(216,255,62,.16);
-    }
-    .wave-btn:hover{
-      transform:translateY(-1px);
-      box-shadow:0 0 0 10px rgba(216,255,62,.22),0 0 26px rgba(216,255,62,.45);
-    }
-    .send-btn{
-      background:#F0F1EF;
-      color:var(--ink);
-    }
-    .send-btn svg{width:24px;height:24px}
-    .wave{
-      display:flex;
-      gap:3px;
-      align-items:center;
-      justify-content:center;
-      width:30px;height:26px;
-    }
-    .wave i{
-      width:3px;border-radius:999px;background:var(--ink);
-      display:block;
-    }
-    .wave i:nth-child(1){height:10px}
-    .wave i:nth-child(2){height:18px}
-    .wave i:nth-child(3){height:25px}
-    .wave i:nth-child(4){height:18px}
-    .wave i:nth-child(5){height:10px}
-    .wave-btn.listening{
-      background:#ff2d2d;
-      box-shadow:0 0 0 12px rgba(255,45,45,.16),0 0 38px rgba(255,45,45,.55);
-      animation:pulse 1.15s ease-in-out infinite;
-    }
-    .wave-btn.listening .wave i{
-      background:white;
-      animation:wave 0.7s ease-in-out infinite;
-    }
-    .wave-btn.listening .wave i:nth-child(2){animation-delay:.08s}
-    .wave-btn.listening .wave i:nth-child(3){animation-delay:.16s}
-    .wave-btn.listening .wave i:nth-child(4){animation-delay:.24s}
-    .wave-btn.listening .wave i:nth-child(5){animation-delay:.32s}
+    .wave-btn{background:var(--lime)}
+    .send-btn{background:#fff;border:1px solid var(--line);color:var(--ink)}
+    .send-btn svg{width:22px;height:22px}
+    .wave{display:flex;gap:3px;align-items:center;justify-content:center;width:30px;height:26px}
+    .wave i{display:block;width:3px;border-radius:999px;background:var(--ink)}
+    .wave i:nth-child(1){height:10px}.wave i:nth-child(2){height:18px}.wave i:nth-child(3){height:25px}.wave i:nth-child(4){height:18px}.wave i:nth-child(5){height:10px}
+    .wave-btn.listening{background:#ff2d2d;animation:pulse 1.15s ease-in-out infinite}
+    .wave-btn.listening .wave i{background:#fff;animation:wave .7s ease-in-out infinite}
+    .wave-btn.listening .wave i:nth-child(2){animation-delay:.08s}.wave-btn.listening .wave i:nth-child(3){animation-delay:.16s}.wave-btn.listening .wave i:nth-child(4){animation-delay:.24s}.wave-btn.listening .wave i:nth-child(5){animation-delay:.32s}
     @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
     @keyframes wave{0%,100%{transform:scaleY(.55)}50%{transform:scaleY(1.15)}}
-    .transcript{
-      text-align:center;
-      color:var(--muted);
-      font-size:12px;
-      min-height:18px;
-      margin-top:8px;
-    }
-
-    /* Observatory */
-    .observatory{
-      padding:0;
-      background:#FCFDFB;
-    }
-    .obs-header{
-      padding:24px 26px 14px;
-    }
-    .obs-title{
-      font-size:25px;
-      font-weight:850;
-      letter-spacing:-.04em;
-      margin:0;
-    }
-    .obs-sub{
-      color:var(--muted);
-      margin-top:5px;
-      font-size:14px;
-    }
-    .live{
-      display:flex;
-      align-items:center;
-      gap:7px;
-      border:1px solid var(--line);
-      background:white;
-      border-radius:999px;
-      padding:8px 12px;
-      font-size:13px;
-      font-weight:750;
-    }
-    .live-dot{
-      width:8px;height:8px;border-radius:50%;
-      background:#30B45B;
-    }
-    .tabs{
-      display:flex;
-      gap:28px;
-      border-bottom:1px solid var(--line);
-      padding:0 26px;
-      margin-top:8px;
-    }
-    .tab{
-      padding:15px 0 13px;
-      color:#4D5350;
-      font-weight:700;
-      font-size:14px;
-      position:relative;
-    }
+    .transcript{display:none}
+    .observatory{background:#fff}
+    .obs-header{padding:22px 26px 8px}
+    .obs-title{font-size:24px;font-weight:850;letter-spacing:-.04em;margin:0}
+    .obs-sub{font-size:13px;color:var(--muted);margin-top:5px}
+    .live{display:flex;align-items:center;gap:7px;border:1px solid var(--line);border-radius:999px;padding:8px 12px;font-size:13px;font-weight:750}
+    .live-dot{width:8px;height:8px;border-radius:50%;background:var(--green)}
+    .tabs{display:flex;gap:32px;border-bottom:1px solid var(--line);padding:0 26px}
+    .tab{padding:13px 0 12px;color:#4D5350;font-size:14px;font-weight:700;position:relative}
     .tab.active{color:var(--ink)}
-    .tab.active:after{
-      content:"";
-      position:absolute;left:0;right:0;bottom:-1px;
-      height:3px;border-radius:999px;
-      background:var(--lime);
-    }
+    .tab.active:after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:3px;border-radius:999px;background:var(--green)}
     .obs-body{
-      padding:20px 22px 24px;
-      display:grid;
-      gap:16px;
-    }
-    .obs-grid{
-      display:grid;
-      grid-template-columns:1.4fr .72fr;
-      gap:16px;
-    }
-    .obs-card{
-      border:1px solid var(--line);
-      background:white;
-      border-radius:18px;
-      padding:16px;
-      box-shadow:0 10px 24px rgba(0,0,0,.035);
-    }
-    .obs-card h3{
-      margin:0 0 13px;
-      font-size:15px;
-      letter-spacing:-.02em;
-      display:flex;
-      align-items:center;
-      gap:8px;
-    }
-    .mini-icon{
-      width:24px;height:24px;border-radius:8px;
-      display:inline-grid;place-items:center;
-      background:#EEF7FF;color:var(--blue);
-      font-size:13px;
-    }
-    .mini-icon.purple{background:#F3EEFF;color:var(--purple)}
-    .mini-icon.green{background:#EAF8EE;color:var(--green)}
-    .mini-icon.orange{background:#FFF2E9;color:var(--orange)}
-    .kv{
-      display:grid;
-      gap:10px;
-    }
-    .row{
-      display:flex;
-      justify-content:space-between;
-      gap:18px;
-      border-bottom:1px solid #EFF1EC;
-      padding-bottom:9px;
-      font-size:13px;
-    }
-    .row:last-child{border-bottom:0;padding-bottom:0}
-    .key{color:var(--muted)}
-    .value{font-weight:800;text-align:right}
-    .confidence-number{
-      color:var(--green);
-      font-size:46px;
-      font-weight:900;
-      letter-spacing:-.08em;
-      margin-top:18px;
-    }
-    .confidence-copy{
-      color:var(--green);
-      font-size:13px;
-      font-weight:800;
-      margin-top:2px;
-    }
-    .bar-row{margin:12px 0}
-    .bar-top{
-      display:flex;
-      justify-content:space-between;
-      font-size:13px;
-      margin-bottom:7px;
-    }
-    .bar-bg{
-      height:8px;border-radius:999px;background:#EAEBE7;
+      height:calc(100% - 126px);
       overflow:hidden;
-    }
-    .bar{
-      height:100%;
-      border-radius:999px;
-      background:var(--green);
-      transition:width .35s ease;
-    }
-    .bar.lime{background:var(--lime)}
-    .bar.orange{background:var(--orange)}
-    .bar.black{background:var(--ink)}
-    .memory-grid{
-      display:flex;
-      flex-wrap:wrap;
-      gap:8px;
-    }
-    .chip{
-      background:#F4F5F1;
-      border-radius:9px;
-      padding:7px 10px;
-      font-size:12px;
-      color:#202623;
-    }
-    .tools{
-      display:grid;gap:10px;
-      font-family:"SF Mono", ui-monospace, Menlo, monospace;
-      font-size:12px;
-    }
-    .tool{
-      display:flex;justify-content:space-between;gap:12px;
-    }
-    .ok{color:#34A853;font-weight:900}
-    .eval-grid{
+      padding:16px;
       display:grid;
-      grid-template-columns:repeat(5,1fr);
       gap:12px;
-      align-items:center;
     }
-    .eval-metric .num{
-      font-size:22px;font-weight:850;letter-spacing:-.05em;
-    }
-    .eval-metric .label{
-      color:var(--muted);font-size:12px;margin-top:3px;
-    }
-    .circle{
-      justify-self:end;
-      width:78px;height:78px;border-radius:50%;
-      display:grid;place-items:center;
-      border:5px solid #61BF63;
-      font-weight:900;
-      font-size:22px;
-    }
-    .circle span{display:block;font-size:10px;color:var(--muted);font-weight:650;text-align:center}
-
+    .obs-grid{display:grid;grid-template-columns:1.4fr .72fr;gap:12px}
+    .obs-card{border:1px solid var(--line);border-radius:16px;padding:14px;background:#fff}
+    .obs-card h3{margin:0 0 10px;font-size:14px;display:flex;align-items:center;gap:8px}
+    .mini-icon{width:24px;height:24px;border-radius:8px;display:grid;place-items:center;background:#EEF7FF;color:#2F80ED;font-size:13px}
+    .mini-icon.purple{background:#F3EEFF;color:#8B5CF6}.mini-icon.green{background:#EAF8EE;color:var(--green)}.mini-icon.orange{background:#FFF2E9;color:#FF6B26}
+    .kv{display:grid;gap:10px}
+    .row{display:flex;justify-content:space-between;gap:18px;border-bottom:1px solid #EFF1EC;padding-bottom:8px;font-size:12px}
+    .row:last-child{border-bottom:0;padding-bottom:0}
+    .key{color:var(--muted)}.value{font-weight:800;text-align:right}
+    .confidence-number{font-size:42px;margin-top:8px;color:var(--green);font-weight:900;letter-spacing:-.08em}
+    .confidence-copy{color:var(--green);font-size:13px;font-weight:800}
+    .bar-row{margin:8px 0}.bar-top{display:flex;justify-content:space-between;font-size:13px;margin-bottom:7px}.bar-bg{height:7px;border-radius:999px;background:#EAEBE7;overflow:hidden}.bar{height:100%;border-radius:999px;background:var(--green)}.bar.lime{background:var(--lime)}.bar.orange{background:var(--orange)}.bar.black{background:var(--ink)}
+    .memory-grid{display:flex;flex-wrap:wrap;gap:6px}.chip{padding:6px 8px;background:#F4F5F1;border-radius:9px;font-size:11px}
+    .tools{display:grid;gap:7px;font-family:"SF Mono",ui-monospace,Menlo,monospace;font-size:11px}.tool{display:flex;justify-content:space-between;gap:12px}.ok{color:#34A853;font-weight:900}
+    .eval-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;align-items:center}.eval-metric .num{font-size:20px;font-weight:850}.eval-metric .label{font-size:12px;color:var(--muted)}.circle{width:70px;height:70px;border-radius:50%;display:grid;place-items:center;border:5px solid #61BF63;font-weight:900;font-size:20px}.circle span{display:block;font-size:10px;color:var(--muted);font-weight:650;text-align:center}
     @media(max-width:980px){
-      .page{grid-template-columns:1fr;padding:12px}
-      .app,.observatory{min-height:auto}
-      .suggestion-grid,.obs-grid{grid-template-columns:1fr}
-      .eval-grid{grid-template-columns:repeat(2,1fr)}
-      .circle{justify-self:start}
+      .page{height:auto;overflow:auto;grid-template-columns:1fr}
+      .app,.observatory{height:auto}
     }
-    @media(max-width:520px){
-      .app,.observatory{border-radius:20px}
-      .app{padding:18px}
-      .brand{font-size:30px}
-      .suggestion{font-size:15px}
-      .message{max-width:88%}
-      .input-wrap{border-radius:22px}
-      .tabs{gap:18px;overflow:auto}
-    }
-  
-/* Final voice picker */
-.voice-menu{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  border:1px solid var(--line);
-  border-radius:999px;
-  padding:8px 14px 8px 8px;
-  background:white;
-  box-shadow:0 10px 22px rgba(0,0,0,.04);
-  cursor:pointer;
-  user-select:none;
-  font-weight:800;
-  position:relative;
-}
-.speaker-icon{
-  width:34px;height:34px;border-radius:50%;
-  background:var(--lime);
-  display:grid;
-  place-items:center;
-}
-.speaker-icon svg{width:18px;height:18px}
-.voice-dropdown{
-  position:absolute;
-  right:0;
-  top:52px;
-  width:286px;
-  background:white;
-  border:1px solid var(--line);
-  border-radius:20px;
-  box-shadow:0 22px 60px rgba(0,0,0,.13);
-  padding:12px;
-  z-index:20;
-  display:none;
-}
-.voice-menu.open .voice-dropdown{display:block}
-.voice-dropdown-title{
-  font-weight:850;
-  font-size:15px;
-  letter-spacing:-.02em;
-  padding:6px 8px 10px;
-}
-.voice-choice{
-  display:grid;
-  grid-template-columns:22px 1fr;
-  gap:10px;
-  align-items:start;
-  padding:12px 10px;
-  border-radius:15px;
-  font-size:15px;
-  font-weight:800;
-}
-.voice-choice:hover{background:#F4F6EF}
-.voice-choice.active{background:#F7FBEF}
-.radio{
-  width:16px;height:16px;border-radius:50%;
-  border:2px solid #9AA09C;
-  margin-top:2px;
-  position:relative;
-}
-.voice-choice.active .radio{
-  border-color:var(--ink);
-  background:var(--lime);
-}
-.voice-choice.active .radio:after{
-  content:"";
-  position:absolute;
-  inset:3px;
-  border-radius:50%;
-  background:var(--ink);
-}
-.voice-desc{
-  display:block;
-  color:var(--muted);
-  font-weight:520;
-  font-size:13px;
-  margin-top:3px;
-}
-.voice-current{
-  display:inline-block;
-  margin-top:7px;
-  color:var(--green);
-  font-weight:800;
-  font-size:12px;
-}
-.voice-muted{
-  opacity:.55;
-}
-
-
-/* Final fit-in-one-page layout */
-.page{
-  height:100vh;
-  min-height:100vh;
-  overflow:hidden;
-  padding:16px;
-}
-.app,.observatory{
-  height:calc(100vh - 32px);
-  min-height:0;
-}
-.app{
-  padding:22px;
-  overflow:hidden;
-}
-.brand{font-size:30px}
-.brand-dot{width:34px;height:34px}
-.tagline{font-size:14px}
-.suggestions{padding-top:22px}
-.suggestion-grid{gap:10px}
-.suggestion{
-  min-height:64px;
-  padding:12px 14px;
-  font-size:15px;
-}
-.s-icon{width:36px;height:36px}
-.money-event{
-  margin-top:16px;
-  padding:13px 16px;
-}
-.amount{font-size:29px}
-.chat{
-  flex:1;
-  min-height:0;
-  overflow-y:auto;
-  margin-top:14px;
-  gap:10px;
-  padding-right:4px;
-}
-.message{
-  padding:12px 14px;
-  font-size:14px;
-  max-width:82%;
-}
-.msg-meta{font-size:12px;margin-bottom:6px}
-.input-wrap{
-  margin-top:10px;
-  flex:0 0 auto;
-}
-input{
-  font-size:16px;
-  padding:12px 6px;
-}
-.wave-btn,.send-btn{
-  width:48px;
-  height:48px;
-}
-.transcript{
-  flex:0 0 auto;
-  margin-top:6px;
-}
-.observatory{
-  overflow:hidden;
-}
-.obs-header{
-  padding:20px 22px 10px;
-}
-.obs-title{font-size:23px}
-.obs-sub{font-size:13px}
-.tabs{
-  padding:0 22px;
-  gap:24px;
-}
-.tab{
-  padding:12px 0 10px;
-}
-.obs-body{
-  height:calc(100% - 132px);
-  overflow-y:auto;
-  padding:16px 18px 20px;
-  gap:12px;
-}
-.obs-grid{gap:12px}
-.obs-card{
-  padding:14px;
-}
-.confidence-number{
-  font-size:38px;
-  margin-top:10px;
-}
-.bar-row{margin:9px 0}
-.voice-choice.off-choice.active{
-  background:#F3F5EF;
-}
-.voice-choice.off-choice .radio{
-  border-color:#767C78;
-}
-.voice-choice.off-choice.active .radio{
-  background:#111;
-  border-color:#111;
-}
-.voice-choice.off-choice.active .radio:after{
-  background:white;
-}
-.voice-choice.off-choice.active .voice-current{
-  color:#555;
-}
-@media(max-width:980px){
-  .page{
-    height:auto;
-    min-height:100vh;
-    overflow:auto;
-  }
-  .app,.observatory{
-    height:auto;
-    min-height:auto;
-  }
-}
-
-</style>
-
-
-
-
-<style id="ava-selected-preview-final">
-:root{
-  --lime:#C9F938!important;
-  --lime-soft:#F4FBE9!important;
-  --ink:#080A09!important;
-  --muted:#5F6662!important;
-  --line:#E8EBE4!important;
-  --panel:#FFFFFF!important;
-  --soft:#FAFAF7!important;
-  --green:#0B8F2F!important;
-}
-body{
-  background:#FAFAF7!important;
-}
-.page{
-  height:100vh!important;
-  min-height:100vh!important;
-  overflow:hidden!important;
-  padding:12px!important;
-  gap:12px!important;
-  grid-template-columns:minmax(460px,.92fr) minmax(520px,1.08fr)!important;
-}
-.app,.observatory{
-  height:calc(100vh - 24px)!important;
-  min-height:0!important;
-  border-radius:18px!important;
-  border:1px solid var(--line)!important;
-  box-shadow:0 8px 22px rgba(0,0,0,.035)!important;
-  background:#fff!important;
-  overflow:hidden!important;
-}
-.app{
-  padding:22px!important;
-}
-.app-header{
-  align-items:center!important;
-  padding-bottom:16px!important;
-}
-.app-header>div:first-child{
-  display:flex!important;
-  align-items:center!important;
-  gap:18px!important;
-  min-width:0!important;
-}
-.brand{
-  font-size:32px!important;
-  font-weight:850!important;
-  letter-spacing:-.055em!important;
-  gap:12px!important;
-  white-space:nowrap!important;
-}
-.brand-dot{
-  width:32px!important;
-  height:32px!important;
-  border-radius:50%!important;
-  background:#fff!important;
-  border:2px solid var(--lime)!important;
-  box-shadow:none!important;
-  flex:0 0 auto!important;
-}
-.brand-dot:after{display:none!important}
-.tagline{
-  margin-top:0!important;
-  font-size:14px!important;
-  color:#3D4440!important;
-  white-space:nowrap!important;
-  letter-spacing:-.01em!important;
-}
-.voice-menu{
-  border-radius:999px!important;
-  padding:7px 12px 7px 7px!important;
-  gap:9px!important;
-  box-shadow:0 4px 14px rgba(0,0,0,.035)!important;
-  flex:0 0 auto!important;
-}
-.speaker-icon{
-  width:30px!important;
-  height:30px!important;
-  background:var(--lime-soft)!important;
-  color:var(--green)!important;
-}
-.voice-dropdown{
-  width:260px!important;
-  border-radius:18px!important;
-  box-shadow:0 18px 40px rgba(0,0,0,.12)!important;
-}
-.suggestions{padding-top:16px!important}
-.section-title{
-  font-size:14px!important;
-  margin-bottom:12px!important;
-}
-.suggestion-grid{
-  grid-template-columns:1fr 1fr!important;
-  gap:12px!important;
-}
-.suggestion:nth-child(n+3){display:none!important}
-.suggestion{
-  min-height:74px!important;
-  padding:14px!important;
-  border-radius:16px!important;
-  font-size:15px!important;
-  background:#fff!important;
-}
-.s-icon{
-  width:40px!important;
-  height:40px!important;
-  background:#EEF8D9!important;
-  color:var(--green)!important;
-}
-.money-event{
-  margin-top:20px!important;
-  padding:12px 14px!important;
-  border-radius:16px!important;
-  min-height:54px!important;
-}
-.money-event>div:first-child{
-  display:flex!important;
-  align-items:center!important;
-  gap:10px!important;
-}
-.money-label{display:none!important}
-.amount{
-  font-size:22px!important;
-  letter-spacing:-.04em!important;
-}
-.amount::before{
-  content:"$";
-  display:inline-grid;
-  place-items:center;
-  width:30px;
-  height:30px;
-  border-radius:50%;
-  background:#EEF8D9;
-  color:var(--green);
-  font-size:17px;
-  margin-right:10px;
-  font-weight:800;
-}
-.amount::after{
-  content:" New cash";
-  font-size:14px;
-  color:var(--muted);
-  font-weight:650;
-  margin-left:10px;
-  letter-spacing:0;
-}
-.pill{
-  background:#F1F8E7!important;
-  color:var(--green)!important;
-  padding:7px 12px!important;
-  border-radius:999px!important;
-}
-.chat{
-  margin-top:18px!important;
-  flex:1!important;
-  min-height:0!important;
-  overflow:hidden!important;
-  gap:16px!important;
-  padding:0!important;
-}
-.avatar{display:none!important}
-.msg-meta{
-  display:block!important;
-  font-size:0!important;
-  margin:0 0 10px!important;
-}
-.msg-meta b{
-  font-size:14px!important;
-  color:var(--green)!important;
-  margin:0!important;
-}
-.msg-meta{color:transparent!important}
-.message{
-  max-width:66%!important;
-  padding:18px 20px!important;
-  border-radius:16px!important;
-  font-size:15px!important;
-  line-height:1.55!important;
-  box-shadow:none!important;
-  border:1px solid #EDF0E6!important;
-}
-.msg-row.user{
-  justify-content:flex-end!important;
-}
-.user .message{
-  background:#F7F8FA!important;
-  border-color:#EEF0F2!important;
-  max-width:50%!important;
-}
-.input-wrap{
-  flex:0 0 auto!important;
-  margin-top:12px!important;
-  border:1px solid #E4E7E2!important;
-  border-radius:16px!important;
-  padding:9px 12px 9px 16px!important;
-  box-shadow:0 8px 22px rgba(0,0,0,.045)!important;
-}
-input{
-  font-size:15px!important;
-  padding:12px 6px!important;
-}
-.wave-btn,.send-btn{
-  width:46px!important;
-  height:46px!important;
-}
-.wave-btn{
-  background:var(--lime)!important;
-  box-shadow:none!important;
-}
-.send-btn{
-  background:#fff!important;
-  border:1px solid var(--line)!important;
-}
-.transcript{display:none!important}
-
-/* Observatory selected-preview tuning */
-.observatory{padding:0!important}
-.obs-header{
-  padding:22px 26px 8px!important;
-}
-.obs-title{
-  font-size:24px!important;
-}
-.tabs{
-  padding:0 26px!important;
-  gap:32px!important;
-}
-.tab{
-  padding:13px 0 12px!important;
-}
-.tab.active:after{
-  background:var(--green)!important;
-  height:3px!important;
-}
-.obs-body{
-  height:calc(100% - 126px)!important;
-  overflow:hidden!important;
-  padding:16px!important;
-  gap:12px!important;
-}
-.obs-grid{gap:12px!important}
-.obs-card{
-  padding:14px!important;
-  border-radius:16px!important;
-  box-shadow:none!important;
-}
-.obs-card h3{
-  margin-bottom:10px!important;
-  font-size:14px!important;
-}
-.row{
-  padding-bottom:8px!important;
-  font-size:12px!important;
-}
-.confidence-number{
-  font-size:42px!important;
-  margin-top:8px!important;
-  color:var(--green)!important;
-}
-.bar-row{margin:8px 0!important}
-.bar-bg{height:7px!important}
-.bar{background:var(--green)!important}
-.bar.lime{background:var(--lime)!important}
-.bar.orange{background:#FFB000!important}
-.memory-grid{gap:6px!important}
-.chip{
-  padding:6px 8px!important;
-  font-size:11px!important;
-}
-.tools{gap:7px!important;font-size:11px!important}
-.eval-grid{
-  gap:8px!important;
-}
-.eval-metric .num{
-  font-size:20px!important;
-}
-.circle{
-  width:70px!important;
-  height:70px!important;
-}
-@media(max-width:980px){
-  .page{
-    height:auto!important;
-    min-height:100vh!important;
-    overflow:auto!important;
-    grid-template-columns:1fr!important;
-  }
-  .app,.observatory{
-    height:auto!important;
-  }
-}
-</style>
-
+  </style>
 </head>
 <body>
   <main class="page">
     <section class="app">
       <header class="app-header">
-        <div>
+        <div class="app-title">
           <div class="brand"><div class="brand-dot"></div>Ava</div>
           <div class="tagline">Money decisions made with confidence.</div>
         </div>
 
         <div id="voiceMenu" class="voice-menu">
-          <div class="speaker-icon" id="speakerIcon">
+          <div class="speaker-icon">
             <svg id="speakerSvg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
               <path d="M11 5 6 9H3v6h3l5 4V5z"></path>
               <path id="speakerWave" d="M15.5 8.5a5 5 0 0 1 0 7"></path>
@@ -1072,23 +342,19 @@ input{
           </div>
           <span id="voiceLabel">Aaron</span>
           <span>⌄</span>
-          <div class="voice-dropdown" id="voiceDropdown">
+          <div class="voice-dropdown">
             <div class="voice-dropdown-title">Choose Ava's voice</div>
-            <div class="voice-choice off-choice" data-voice-key="Off" data-voice-name="" data-label="Off">
+            <div class="voice-choice off-choice" data-voice-key="Off" data-label="Off">
               <span class="radio"></span>
               <div>Off<span class="voice-desc">Text only</span></div>
             </div>
-            <div class="voice-choice active" data-voice-key="Aaron" data-voice-name="Aaron" data-label="Aaron">
+            <div class="voice-choice active" data-voice-key="Aaron" data-label="Aaron">
               <span class="radio"></span>
               <div>Aaron<span class="voice-desc">Calm male</span><span class="voice-current">Current voice</span></div>
             </div>
-            <div class="voice-choice" data-voice-key="Samantha" data-voice-name="Samantha" data-label="Samantha">
+            <div class="voice-choice" data-voice-key="Samantha" data-label="Samantha">
               <span class="radio"></span>
               <div>Samantha<span class="voice-desc">Warm female</span></div>
-            </div>
-            <div class="voice-choice" data-voice-key="Daniel" data-voice-name="Daniel" data-label="Daniel">
-              <span class="radio"></span>
-              <div>Daniel<span class="voice-desc">British</span></div>
             </div>
           </div>
         </div>
@@ -1097,40 +363,39 @@ input{
       <section class="suggestions">
         <div class="section-title">Suggested questions</div>
         <div class="suggestion-grid">
-          <div class="suggestion" data-prompt="How much have I deposited this year?">
-            <div class="s-left"><span class="s-icon">↗</span><span>How much have I deposited this year?</span></div><span class="chev">›</span>
-          </div>
           <div class="suggestion" data-prompt="I got $500 today. What should I do with it?">
-            <div class="s-left"><span class="s-icon">▣</span><span>I got $500 today. What should I do with it?</span></div><span class="chev">›</span>
+            <div class="s-left"><span class="s-icon">▣</span><span>I got $500 today.<br>What should I do with it?</span></div><span class="chev">›</span>
           </div>
           <div class="suggestion" data-prompt="Should I buy more QQQ?">
             <div class="s-left"><span class="s-icon">⌕</span><span>Should I buy more QQQ?</span></div><span class="chev">›</span>
-          </div>
-          <div class="suggestion" data-prompt="Am I too concentrated in AI and tech?">
-            <div class="s-left"><span class="s-icon">◔</span><span>Am I too concentrated in AI and tech?</span></div><span class="chev">›</span>
           </div>
         </div>
       </section>
 
       <section class="money-event">
-        <div>
-          <div class="money-label">Today’s money event</div>
-          <div class="amount">+$500</div>
+        <div class="money-event-main">
+          <div class="amount">500</div>
         </div>
-        <div class="pill">New cash</div>
+        <div class="pill">Today</div>
       </section>
 
       <section id="chat" class="chat">
         <div class="msg-row">
-          <div class="avatar"></div>
           <div class="message">
-            <div class="msg-meta"><b>Ava</b>10:42 AM</div>
-I noticed you received $500 today.
+            <div class="msg-meta"><b>Ava</b></div>
+How are you today?
 
-What were you thinking of doing with this money?
+I'm Ava.
+
+I'm here to help you make money decisions with confidence.
           </div>
         </div>
       </section>
+
+      <div id="readingStatus" class="reading-status" style="display:none">
+        <span>🔊 Reading response...</span>
+        <button id="stopReadingInline" type="button">Stop reading</button>
+      </div>
 
       <div class="input-wrap">
         <form id="inputForm" class="inputbar">
@@ -1171,10 +436,10 @@ What were you thinking of doing with this money?
           <div class="obs-card">
             <h3><span class="mini-icon purple">✦</span>Current intent</h3>
             <div class="kv">
-              <div class="row"><div class="key">Intent</div><div id="intent" class="value">Cash allocation</div></div>
-              <div class="row"><div class="key">User goal</div><div id="goal" class="value">Decide what to do with $500</div></div>
-              <div class="row"><div class="key">Decision stage</div><div id="stage" class="value">Clarify motivation</div></div>
-              <div class="row"><div class="key">Recommended next step</div><div id="nextStep" class="value">Provide options</div></div>
+              <div class="row"><div class="key">Intent</div><div id="intent" class="value">Greeting</div></div>
+              <div class="row"><div class="key">User goal</div><div id="goal" class="value">Understand Ava</div></div>
+              <div class="row"><div class="key">Decision stage</div><div id="stage" class="value">First contact</div></div>
+              <div class="row"><div class="key">Recommended next step</div><div id="nextStep" class="value">Invite question</div></div>
             </div>
           </div>
 
@@ -1188,33 +453,18 @@ What were you thinking of doing with this money?
 
         <div class="obs-card">
           <h3><span class="mini-icon">▥</span>Decision factors</h3>
-          <div class="bar-row">
-            <div class="bar-top"><span>Goal alignment</span><b id="goalVal">78%</b></div>
-            <div class="bar-bg"><div id="goalBar" class="bar" style="width:78%"></div></div>
-          </div>
-          <div class="bar-row">
-            <div class="bar-top"><span>Liquidity need</span><b id="liqVal">62%</b></div>
-            <div class="bar-bg"><div id="liqBar" class="bar lime" style="width:62%"></div></div>
-          </div>
-          <div class="bar-row">
-            <div class="bar-top"><span>Portfolio concentration</span><b id="riskVal">70%</b></div>
-            <div class="bar-bg"><div id="riskBar" class="bar orange" style="width:70%"></div></div>
-          </div>
-          <div class="bar-row">
-            <div class="bar-top"><span>Risk tolerance</span><b id="tolVal">60%</b></div>
-            <div class="bar-bg"><div id="tolBar" class="bar orange" style="width:60%"></div></div>
-          </div>
-          <div class="bar-row">
-            <div class="bar-top"><span>Recommendation confidence</span><b id="recVal">82%</b></div>
-            <div class="bar-bg"><div id="recBar" class="bar black" style="width:82%"></div></div>
-          </div>
+          <div class="bar-row"><div class="bar-top"><span>Goal alignment</span><b id="goalVal">78%</b></div><div class="bar-bg"><div id="goalBar" class="bar" style="width:78%"></div></div></div>
+          <div class="bar-row"><div class="bar-top"><span>Liquidity need</span><b id="liqVal">62%</b></div><div class="bar-bg"><div id="liqBar" class="bar lime" style="width:62%"></div></div></div>
+          <div class="bar-row"><div class="bar-top"><span>Portfolio concentration</span><b id="riskVal">70%</b></div><div class="bar-bg"><div id="riskBar" class="bar orange" style="width:70%"></div></div></div>
+          <div class="bar-row"><div class="bar-top"><span>Risk tolerance</span><b id="tolVal">60%</b></div><div class="bar-bg"><div id="tolBar" class="bar orange" style="width:60%"></div></div></div>
+          <div class="bar-row"><div class="bar-top"><span>Recommendation confidence</span><b id="recVal">82%</b></div><div class="bar-bg"><div id="recBar" class="bar black" style="width:82%"></div></div></div>
         </div>
 
         <div class="obs-grid">
           <div class="obs-card">
             <h3><span class="mini-icon">◒</span>Retrieved memory</h3>
-            <div id="memory" class="memory-grid">
-              <span class="chip">Saving for a home (target: Q2 2026)</span>
+            <div class="memory-grid">
+              <span class="chip">Saving for a home</span>
               <span class="chip">AI-heavy portfolio</span>
               <span class="chip">Prefers clear tradeoffs</span>
               <span class="chip">Uses Robinhood frequently</span>
@@ -1223,10 +473,10 @@ What were you thinking of doing with this money?
 
           <div class="obs-card">
             <h3><span class="mini-icon purple">⌁</span>Recent tools</h3>
-            <div id="tools" class="tools">
+            <div class="tools">
               <div class="tool"><span>get_account_summary</span><span><span class="ok">●</span> 120ms</span></div>
-              <div class="tool"><span>get_portfolio_analysis</span><span><span class="ok">●</span> 340ms</span></div>
-              <div class="tool"><span>get_recent_transactions</span><span><span class="ok">●</span> 98ms</span></div>
+              <div class="tool"><span>portfolio_analysis</span><span><span class="ok">●</span> 340ms</span></div>
+              <div class="tool"><span>recent_transactions</span><span><span class="ok">●</span> 98ms</span></div>
               <div class="tool"><span>market_news_search</span><span><span class="ok">●</span> 620ms</span></div>
             </div>
           </div>
@@ -1247,62 +497,57 @@ What were you thinking of doing with this money?
   </main>
 
   <script>
-    const sample = {
-      depositsYTD: 12450,
-      monthlyAverageDeposit: 1038,
-      techExposure: 42,
-      aiExposure: 34
-    };
+    document.addEventListener("DOMContentLoaded", () => {
+      const sample = { depositsYTD:12450, monthlyAverageDeposit:1038, techExposure:42, aiExposure:34 };
+      const chat = document.getElementById("chat");
+      const form = document.getElementById("inputForm");
+      const input = document.getElementById("textInput");
+      const mic = document.getElementById("mic");
+      const transcript = document.getElementById("transcript");
+      const readingStatus = document.getElementById("readingStatus");
+      const stopReadingInline = document.getElementById("stopReadingInline");
+      const voiceMenu = document.getElementById("voiceMenu");
+      const voiceLabel = document.getElementById("voiceLabel");
+      const voiceChoices = document.querySelectorAll(".voice-choice");
+      const speakerWave = document.getElementById("speakerWave");
 
-    const chat = document.getElementById("chat");
-    const form = document.getElementById("inputForm");
-    const input = document.getElementById("textInput");
-    const mic = document.getElementById("mic");
-    const transcript = document.getElementById("transcript");
-    const voiceMenu = document.getElementById("voiceMenu");
-    const voiceLabel = document.getElementById("voiceLabel");
-    const voiceChoices = document.querySelectorAll(".voice-choice");
-    const speakerWave = document.getElementById("speakerWave");
+      let speechOn = true;
+      let voices = [];
+      let selectedVoiceKey = "Aaron";
+      let selectedVoiceName = "";
+      let recognition = null;
+      let listening = false;
 
-    let speechOn = true;
-    let voices = [];
-    let selectedVoiceKey = "Aaron";
-    let selectedVoiceName = "";
-    let recognition = null;
-    let listening = false;
+      const obs = {
+        intent: document.getElementById("intent"),
+        goal: document.getElementById("goal"),
+        stage: document.getElementById("stage"),
+        nextStep: document.getElementById("nextStep"),
+        confBig: document.getElementById("confBig"),
+        goalVal: document.getElementById("goalVal"),
+        liqVal: document.getElementById("liqVal"),
+        riskVal: document.getElementById("riskVal"),
+        tolVal: document.getElementById("tolVal"),
+        recVal: document.getElementById("recVal"),
+        goalBar: document.getElementById("goalBar"),
+        liqBar: document.getElementById("liqBar"),
+        riskBar: document.getElementById("riskBar"),
+        tolBar: document.getElementById("tolBar"),
+        recBar: document.getElementById("recBar")
+      };
 
-    const obs = {
-      intent: document.getElementById("intent"),
-      goal: document.getElementById("goal"),
-      stage: document.getElementById("stage"),
-      nextStep: document.getElementById("nextStep"),
-      confBig: document.getElementById("confBig"),
-      goalVal: document.getElementById("goalVal"),
-      liqVal: document.getElementById("liqVal"),
-      riskVal: document.getElementById("riskVal"),
-      tolVal: document.getElementById("tolVal"),
-      recVal: document.getElementById("recVal"),
-      goalBar: document.getElementById("goalBar"),
-      liqBar: document.getElementById("liqBar"),
-      riskBar: document.getElementById("riskBar"),
-      tolBar: document.getElementById("tolBar"),
-      recBar: document.getElementById("recBar")
-    };
-
-    function money(n){ return "$" + n.toLocaleString(); }
-
-    function classify(text){
-      const q = text.toLowerCase();
-      if(q.includes("deposit")) return "deposits";
-      if(q.includes("qqq") || q.includes("buy more")) return "qqq";
-      if(q.includes("concentrated") || q.includes("tech") || q.includes("ai")) return "concentration";
-      if(q.includes("500") || q.includes("bonus") || q.includes("cash") || q.includes("money")) return "cash";
-      if(q.includes("afford")) return "afford";
-      return "general";
-    }
-
-    function replyFor(type){
-      if(type === "deposits") return `You've deposited ${money(sample.depositsYTD)} into Robinhood this year.
+      function money(n){ return "$" + n.toLocaleString(); }
+      function classify(text){
+        const q = text.toLowerCase();
+        if(q.includes("deposit")) return "deposits";
+        if(q.includes("qqq") || q.includes("buy more")) return "qqq";
+        if(q.includes("concentrated") || q.includes("tech") || q.includes("ai")) return "concentration";
+        if(q.includes("500") || q.includes("bonus") || q.includes("cash") || q.includes("money")) return "cash";
+        if(q.includes("afford")) return "afford";
+        return "general";
+      }
+      function replyFor(type){
+        if(type === "deposits") return `You've deposited ${money(sample.depositsYTD)} into Robinhood this year.
 
 That's about ${money(sample.monthlyAverageDeposit)} per month.
 
@@ -1310,18 +555,23 @@ Can I make one observation?
 
 You're saving more consistently than you probably give yourself credit for. The next question is whether those dollars are moving toward the goal you care about most.`;
 
-      if(type === "qqq") return `Interesting.
+        if(type === "qqq") return `Maybe.
 
-Is buying more QQQ about your long-term conviction in AI, or does it feel hard watching the market move higher without you?
+The first question isn't whether QQQ is attractive.
 
-I would compare two choices:
+It's whether buying more QQQ improves your overall portfolio.
 
-Option A: put the full $500 into QQQ.
-Option B: split it — $250 toward QQQ and $250 toward your home fund.
+From what I see:
 
-Which one feels more aligned with the future you're trying to fund?`;
+• You already have meaningful exposure to AI and technology.
+• QQQ would increase concentration in the same theme.
+• You also have a home down-payment goal in the next few years.
 
-      if(type === "concentration") return `Maybe.
+If QQQ dropped 25% next month, would you be excited to buy more, or stressed that you needed the cash elsewhere?
+
+Your answer tells us more than any market forecast.`;
+
+        if(type === "concentration") return `Maybe.
 
 About ${sample.techExposure}% of your portfolio is tied to tech, and around ${sample.aiExposure}% is tied to AI-related investments.
 
@@ -1329,19 +579,27 @@ That is not automatically bad. The better question is:
 
 If AI underperformed for three to five years, would you still feel okay with this allocation?`;
 
-      if(type === "cash") return `Nice.
+        if(type === "cash") return `Congrats on the extra $500.
 
-Before we optimize it, I want to understand the instinct.
+Before deciding where it goes, let's connect it to your priorities.
 
-Were you thinking of investing it, saving it for the home goal, or using some of it for something fun?
+From what I know:
 
-If the home goal is still the priority, my first-pass split would be:
+• You're saving toward a future home purchase.
+• Your portfolio already has meaningful AI and tech exposure.
+• You value keeping some dry powder for opportunities.
+
+A simple starting point could be:
 
 $250 → Home fund
-$150 → Long-term investing
-$100 → Flex / fun money`;
+$150 → QQQ / long-term investing
+$100 → Fun money
 
-      if(type === "afford") return `Possibly.
+That keeps you moving toward your goals without making every dollar feel over-optimized.
+
+Which bucket feels most important right now?`;
+
+        if(type === "afford") return `Possibly.
 
 I would separate two questions:
 
@@ -1350,210 +608,185 @@ I would separate two questions:
 
 If it does not slow down your home goal or force you to sell investments at a bad time, it may be reasonable.`;
 
-      return `That's worth talking through.
+        return `That's worth talking through.
 
 Before I give you a recommendation, what is pulling you toward that option right now — conviction, convenience, fear of missing out, or a specific goal?
 
 The motivation matters because the same action can be smart in one context and impulsive in another.`;
-    }
-
-    function updateObs(type){
-      let d = {
-        intent:"Cash allocation", goal:"Decide what to do with $500", stage:"Clarify motivation", next:"Provide options",
-        g:78,l:62,r:70,t:60,c:82
-      };
-      if(type==="deposits") d = {intent:"Deposit analysis", goal:"Understand saving behavior", stage:"Explain pattern", next:"Connect deposits to goals", g:74,l:65,r:38,t:72,c:88};
-      if(type==="qqq") d = {intent:"Evaluate QQQ buy", goal:"Balance growth and home goal", stage:"Separate conviction vs FOMO", next:"Compare full buy vs split allocation", g:52,l:58,r:76,t:60,c:81};
-      if(type==="concentration") d = {intent:"Portfolio risk analysis", goal:"Stress-test AI exposure", stage:"Assess concentration risk", next:"Define sleep-at-night threshold", g:65,l:60,r:82,t:54,c:84};
-      if(type==="cash") d = {intent:"Cash allocation", goal:"Decide what to do with $500", stage:"Clarify motivation", next:"Provide options", g:86,l:70,r:44,t:68,c:83};
-      if(type==="afford") d = {intent:"Affordability check", goal:"Avoid regret", stage:"Separate affordability from guilt", next:"Check impact on goals", g:68,l:72,r:48,t:66,c:79};
-
-      obs.intent.textContent = d.intent;
-      obs.goal.textContent = d.goal;
-      obs.stage.textContent = d.stage;
-      obs.nextStep.textContent = d.next;
-      obs.confBig.textContent = d.c + "%";
-      setBar("goal", d.g); setBar("liq", d.l); setBar("risk", d.r); setBar("tol", d.t); setBar("rec", d.c);
-    }
-
-    function setBar(name, val){
-      obs[name+"Val"].textContent = val + "%";
-      obs[name+"Bar"].style.width = val + "%";
-    }
-
-    function addMessage(role, text){
-      const row = document.createElement("div");
-      row.className = "msg-row " + (role === "user" ? "user" : "");
-      const now = role === "user" ? "10:43 AM" : "10:42 AM";
-
-      if(role === "ava"){
-        const av = document.createElement("div");
-        av.className = "avatar";
-        row.appendChild(av);
       }
 
-      const bubble = document.createElement("div");
-      bubble.className = "message";
-      bubble.innerHTML = `<div class="msg-meta"><b>${role === "ava" ? "Ava" : "You"}</b>${now}</div>${escapeHtml(text)}`;
-      row.appendChild(bubble);
-      chat.appendChild(row);
-      row.scrollIntoView({behavior:"smooth", block:"end"});
-    }
+      function updateObs(type){
+        let d = {intent:"Cash allocation", goal:"Decide what to do with $500", stage:"Clarify motivation", next:"Provide options", g:78,l:62,r:70,t:60,c:82};
+        if(type==="deposits") d = {intent:"Deposit analysis", goal:"Understand saving behavior", stage:"Explain pattern", next:"Connect deposits to goals", g:74,l:65,r:38,t:72,c:88};
+        if(type==="qqq") d = {intent:"Evaluate QQQ buy", goal:"Balance growth and home goal", stage:"Separate conviction vs FOMO", next:"Compare full buy vs split allocation", g:52,l:58,r:76,t:60,c:81};
+        if(type==="concentration") d = {intent:"Portfolio risk analysis", goal:"Stress-test AI exposure", stage:"Assess concentration risk", next:"Define sleep-at-night threshold", g:65,l:60,r:82,t:54,c:84};
+        if(type==="cash") d = {intent:"Cash allocation", goal:"Decide what to do with $500", stage:"Clarify motivation", next:"Provide options", g:86,l:70,r:44,t:68,c:83};
+        if(type==="afford") d = {intent:"Affordability check", goal:"Avoid regret", stage:"Separate affordability from guilt", next:"Check impact on goals", g:68,l:72,r:48,t:66,c:79};
+        obs.intent.textContent = d.intent;
+        obs.goal.textContent = d.goal;
+        obs.stage.textContent = d.stage;
+        obs.nextStep.textContent = d.next;
+        obs.confBig.textContent = d.c + "%";
+        setBar("goal", d.g); setBar("liq", d.l); setBar("risk", d.r); setBar("tol", d.t); setBar("rec", d.c);
+      }
+      function setBar(name,val){
+        obs[name+"Val"].textContent = val + "%";
+        obs[name+"Bar"].style.width = val + "%";
+      }
+      function escapeHtml(str){
+        return str.replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll("\n","<br>");
+      }
+      function addMessage(role,text){
+        const row = document.createElement("div");
+        row.className = "msg-row " + (role === "user" ? "user" : "");
+        const bubble = document.createElement("div");
+        bubble.className = "message";
+        bubble.innerHTML = `<div class="msg-meta"><b>${role === "ava" ? "Ava" : "You"}</b></div>${escapeHtml(text)}`;
+        row.appendChild(bubble);
+        chat.appendChild(row);
+        row.scrollIntoView({behavior:"smooth",block:"end"});
+      }
+      function handleInput(text){
+        const clean = text.trim();
+        if(!clean) return;
+        addMessage("user", clean);
+        input.value = "";
+        setTimeout(() => {
+          const type = classify(clean);
+          const response = replyFor(type);
+          addMessage("ava", response);
+          updateObs(type);
+          speak(response);
+        }, 260);
+      }
 
-    function escapeHtml(str){
-      return str.replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll("\n","<br>");
-    }
+      document.querySelectorAll(".suggestion").forEach(el => {
+        el.addEventListener("click", () => handleInput(el.dataset.prompt || el.textContent));
+      });
+      form.addEventListener("submit", e => {
+        e.preventDefault();
+        handleInput(input.value);
+      });
 
-    function handleInput(text){
-      const clean = text.trim();
-      if(!clean) return;
-      addMessage("user", clean);
-      input.value = "";
-      transcript.textContent = "Ava is thinking...";
-
-      setTimeout(() => {
-        const type = classify(clean);
-        const response = replyFor(type);
-        addMessage("ava", response);
-        updateObs(type);
-        transcript.textContent = "Click the wave button to speak, or type your question.";
-        speak(response);
-      }, 260);
-    }
-
-    form.addEventListener("submit", e => {
-      e.preventDefault();
-      handleInput(input.value);
-    });
-
-    document.querySelectorAll(".suggestion").forEach(el => {
-      el.addEventListener("click", () => handleInput(el.dataset.prompt));
-    });
-
-    voiceMenu.addEventListener("click", e => {
-      voiceMenu.classList.toggle("open");
-      e.stopPropagation();
-    });
-    document.addEventListener("click", () => voiceMenu.classList.remove("open"));
-
-    voiceChoices.forEach(choice => {
-      choice.addEventListener("click", e => {
-        const key = choice.dataset.voiceKey;
-        selectedVoiceKey = key;
-        voiceLabel.textContent = choice.dataset.label;
-
-        voiceChoices.forEach(c => {
-          c.classList.remove("active");
-          const current = c.querySelector(".voice-current");
-          if(current) current.remove();
-        });
-        choice.classList.add("active");
-        choice.querySelector("div").insertAdjacentHTML("beforeend", '<span class="voice-current">Current voice</span>');
-
-        if(key === "Off"){
-          speechOn = false;
-          if(window.speechSynthesis) speechSynthesis.cancel();
-          if(speakerWave) speakerWave.style.display = "none";
-          e.stopPropagation();
-          return;
-        }
-
-        speechOn = true;
-        if(speakerWave) speakerWave.style.display = "";
-        pickVoiceByKey(key);
-        speak("Hi, I'm Ava. I'll help you make money decisions with confidence.");
+      voiceMenu.addEventListener("click", e => {
+        voiceMenu.classList.toggle("open");
         e.stopPropagation();
       });
-    });
+      document.addEventListener("click", () => voiceMenu.classList.remove("open"));
 
-    function loadVoices(){
-      if(!window.speechSynthesis) return;
-      voices = speechSynthesis.getVoices();
-      pickVoiceByKey(selectedVoiceKey);
-    }
+      voiceChoices.forEach(choice => {
+        choice.addEventListener("click", e => {
+          const key = choice.dataset.voiceKey;
+          selectedVoiceKey = key;
+          voiceLabel.textContent = choice.dataset.label;
+          voiceChoices.forEach(c => {
+            c.classList.remove("active");
+            const current = c.querySelector(".voice-current");
+            if(current) current.remove();
+          });
+          choice.classList.add("active");
+          choice.querySelector("div").insertAdjacentHTML("beforeend", '<span class="voice-current">Current voice</span>');
+          if(key === "Off"){
+            speechOn = false;
+            if(window.speechSynthesis) speechSynthesis.cancel();
+            if(readingStatus) readingStatus.style.display = "none";
+            if(speakerWave) speakerWave.style.display = "none";
+            e.stopPropagation();
+            return;
+          }
+          speechOn = true;
+          if(speakerWave) speakerWave.style.display = "";
+          pickVoiceByKey(key);
+          speak("Hi, I'm Ava. I'll help you make money decisions with confidence.");
+          e.stopPropagation();
+        });
+      });
 
-    function pickVoiceByKey(key){
-      if(!voices.length) return;
-      const match = voices.find(v => 
-        v.name.toLowerCase().includes(key.toLowerCase()) && 
-        v.lang.toLowerCase().startsWith("en")
-      );
-      if(match) selectedVoiceName = match.name;
-      else {
-        const us = voices.find(v => v.lang === "en-US");
-        if(us) selectedVoiceName = us.name;
+      function loadVoices(){
+        if(!window.speechSynthesis) return;
+        voices = speechSynthesis.getVoices();
+        pickVoiceByKey(selectedVoiceKey);
       }
-    }
-
-    if(window.speechSynthesis){
-      loadVoices();
-      speechSynthesis.onvoiceschanged = loadVoices;
-    }
-
-    function speak(text){
-      if(!speechOn || !window.speechSynthesis) return;
-      const u = new SpeechSynthesisUtterance(text.replace(/\n+/g," "));
-      u.rate = .91;
-      u.pitch = .94;
-      const v = voices.find(x => x.name === selectedVoiceName);
-      if(v) u.voice = v;
-      speechSynthesis.cancel();
-      speechSynthesis.speak(u);
-    }
-
-    function setupSpeech(){
-      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if(!SR){
-        transcript.textContent = "Voice input works best in Chrome. Typing works everywhere.";
-        return;
-      }
-      recognition = new SR();
-      recognition.continuous = false;
-      recognition.interimResults = true;
-      recognition.lang = "en-US";
-
-      recognition.onstart = () => {
-        listening = true;
-        mic.classList.add("listening");
-        transcript.textContent = "Listening...";
-      };
-
-      recognition.onresult = e => {
-        let finalText = "";
-        let interim = "";
-        for(let i=e.resultIndex; i<e.results.length; i++){
-          const txt = e.results[i][0].transcript;
-          if(e.results[i].isFinal) finalText += txt;
-          else interim += txt;
+      function pickVoiceByKey(key){
+        if(!voices.length) return;
+        const match = voices.find(v => v.name.toLowerCase().includes(key.toLowerCase()) && v.lang.toLowerCase().startsWith("en"));
+        if(match) selectedVoiceName = match.name;
+        else {
+          const us = voices.find(v => v.lang === "en-US");
+          if(us) selectedVoiceName = us.name;
         }
-        const heard = finalText || interim;
-        input.value = heard;
-        transcript.textContent = heard ? `Heard: “${heard}”` : "Listening...";
-        if(finalText.trim()) setTimeout(() => handleInput(finalText), 160);
-      };
-
-      recognition.onend = () => {
-        listening = false;
-        mic.classList.remove("listening");
-      };
-
-      recognition.onerror = () => {
-        listening = false;
-        mic.classList.remove("listening");
-        transcript.textContent = "Could not access mic. You can type instead.";
-      };
-    }
-
-    mic.addEventListener("click", () => {
-      if(!recognition) return;
-      if(listening) recognition.stop();
-      else {
-        try { recognition.start(); }
-        catch { transcript.textContent = "Voice is starting. Try again in a second."; }
       }
-    });
+      if(window.speechSynthesis){
+        loadVoices();
+        speechSynthesis.onvoiceschanged = loadVoices;
+      }
+      function speak(text){
+        if(!speechOn || !window.speechSynthesis) return;
+        const u = new SpeechSynthesisUtterance(text.replace(/\n+/g," "));
+        u.rate = .91;
+        u.pitch = .94;
+        const v = voices.find(x => x.name === selectedVoiceName);
+        if(v) u.voice = v;
+        if(readingStatus) readingStatus.style.display = "flex";
+        u.onend = () => { if(readingStatus) readingStatus.style.display = "none"; };
+        u.onerror = () => { if(readingStatus) readingStatus.style.display = "none"; };
+        speechSynthesis.cancel();
+        speechSynthesis.speak(u);
+      }
+      if(stopReadingInline){
+        stopReadingInline.addEventListener("click", () => {
+          if(window.speechSynthesis) speechSynthesis.cancel();
+          if(readingStatus) readingStatus.style.display = "none";
+        });
+      }
+      const firstGreeting = `How are you today?
 
-    setupSpeech();
+I'm Ava.
+
+I'm here to help you make money decisions with confidence.`;
+      setTimeout(() => speak(firstGreeting), 700);
+
+      function setupSpeech(){
+        const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if(!SR) return;
+        recognition = new SR();
+        recognition.continuous = false;
+        recognition.interimResults = true;
+        recognition.lang = "en-US";
+        recognition.onstart = () => {
+          listening = true;
+          mic.classList.add("listening");
+        };
+        recognition.onresult = e => {
+          let finalText = "";
+          let interim = "";
+          for(let i=e.resultIndex;i<e.results.length;i++){
+            const txt = e.results[i][0].transcript;
+            if(e.results[i].isFinal) finalText += txt;
+            else interim += txt;
+          }
+          input.value = finalText || interim;
+          if(finalText.trim()) setTimeout(() => handleInput(finalText), 160);
+        };
+        recognition.onend = () => {
+          listening = false;
+          mic.classList.remove("listening");
+        };
+        recognition.onerror = () => {
+          listening = false;
+          mic.classList.remove("listening");
+        };
+      }
+      setupSpeech();
+      mic.addEventListener("click", () => {
+        if(!recognition) return;
+        if(listening) recognition.stop();
+        else {
+          try { recognition.start(); }
+          catch {}
+        }
+      });
+    });
   </script>
 </body>
 </html>
