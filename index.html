@@ -1,107 +1,1335 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Ava — Agent + Decision Compass</title>
-<style>
-:root{--lime:#D8FF3E;--ink:#070A09;--muted:#68706C;--soft:#F7F8F3;--line:#E7EADF;--good:#19A463;--warn:#E9A900;--risk:#FF6B4A}
-*{box-sizing:border-box}body{margin:0;background:#fff;color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Inter","Segoe UI",sans-serif}
-.shell{min-height:100vh;display:grid;grid-template-columns:minmax(420px,1.12fr) minmax(360px,.88fr);background:radial-gradient(circle at 14% -2%,rgba(216,255,62,.38),transparent 24%),#fff}
-.left,.right{padding:26px}.left{display:flex;flex-direction:column;border-right:1px solid var(--line);min-height:100vh}.right{background:#FBFCF7;overflow-y:auto;max-height:100vh}
-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px}.brand{display:flex;align-items:center;gap:11px;font-size:28px;font-weight:800;letter-spacing:-.05em}.dot{width:34px;height:34px;border-radius:50%;background:var(--lime);box-shadow:0 0 32px rgba(216,255,62,.65)}.tag{color:var(--muted);font-size:13px;margin-top:2px}
-.switch{width:48px;height:28px;border-radius:999px;background:var(--ink);position:relative;cursor:pointer}.switch.off{background:#D8DCD0}.knob{width:22px;height:22px;background:white;border-radius:50%;position:absolute;top:3px;left:23px;transition:.18s}.switch.off .knob{left:3px}.voice-toggle{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:12px}
-.hero,.chat,.obs-card,.money-card{background:#fff;border:1px solid var(--line);box-shadow:0 18px 45px rgba(7,10,9,.07)}.hero{border-radius:30px;padding:26px;margin-bottom:18px}h1{margin:0 0 12px;font-size:clamp(28px,4vw,46px);line-height:.98;letter-spacing:-.075em}.hero p{font-size:17px;line-height:1.45;color:#222824;margin:0}
-.examples{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:20px}.example{background:#FAFBF5;border:1px solid var(--line);border-radius:18px;padding:13px 14px;font-size:14px;cursor:pointer;transition:.14s}.example:hover{background:#EEFFC1;border-color:var(--ink);transform:translateY(-1px)}
-.money-card{border-radius:26px;padding:17px;display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}.money-label{font-size:12px;font-weight:800;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px}.amount{font-size:32px;font-weight:850;letter-spacing:-.065em}.pill{padding:8px 11px;background:var(--lime);border-radius:999px;font-size:12px;font-weight:800}
-.chat{flex:1;border-radius:30px;padding:18px;display:flex;flex-direction:column;gap:12px;min-height:360px;overflow-y:auto;margin-bottom:14px}.bubble{max-width:78%;padding:15px 16px;border-radius:20px;font-size:15px;line-height:1.44;white-space:pre-wrap}.ava{background:#F3F5EE;border-bottom-left-radius:7px;align-self:flex-start}.user{background:var(--ink);color:#fff;border-bottom-right-radius:7px;align-self:flex-end}.speaker{color:var(--muted);font-size:11px;font-weight:850;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px}
-.inputbar{display:flex;align-items:center;gap:8px;border:1px solid var(--line);background:#fff;border-radius:999px;padding:8px;box-shadow:0 14px 28px rgba(0,0,0,.06)}input{flex:1;border:0;outline:none;padding:10px 8px 10px 12px;background:transparent;color:var(--ink);font-size:15px}button{border:0;border-radius:999px;background:var(--ink);color:#fff;padding:11px 16px;font-weight:800;cursor:pointer}.mic{width:44px;height:44px;padding:0;color:var(--ink);background:var(--lime);display:grid;place-items:center;font-size:18px}.mic.listening{box-shadow:0 0 0 8px rgba(216,255,62,.22),0 0 34px rgba(216,255,62,.7);animation:pulse 1.15s ease-in-out infinite}@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}.transcript{text-align:center;min-height:18px;margin:8px 0 0;color:var(--muted);font-size:12px}.voice-select{width:100%;margin-top:10px;border-radius:16px;border:1px solid var(--line);padding:10px;background:#fff;color:var(--ink)}
-.console-title{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:16px}.console-title h2{margin:0;font-size:25px;letter-spacing:-.055em}.live{display:inline-flex;align-items:center;gap:7px;background:#fff;border:1px solid var(--line);padding:8px 10px;border-radius:999px;color:var(--muted);font-size:12px;font-weight:750}.live-dot{width:8px;height:8px;border-radius:50%;background:var(--good)}
-.obs-card{border-radius:24px;padding:17px;margin-bottom:13px;box-shadow:0 12px 26px rgba(0,0,0,.035)}.obs-card h3{margin:0 0 12px;font-size:15px}.kv{display:grid;gap:10px}.row{display:flex;justify-content:space-between;gap:14px;font-size:13px;padding-bottom:9px;border-bottom:1px solid #F0F1EB}.row:last-child{border-bottom:0;padding-bottom:0}.key{color:var(--muted)}.value{font-weight:780;text-align:right}
-.bar-row{margin:11px 0}.bar-top{display:flex;justify-content:space-between;font-size:12px;margin-bottom:7px}.bar-bg{height:9px;border-radius:999px;background:#EEF0E9;overflow:hidden}.bar{height:100%;border-radius:999px;width:0;background:var(--ink);transition:width .45s}.bar.lime{background:var(--lime)}.bar.warn{background:var(--warn)}.bar.risk{background:var(--risk)}.bar.good{background:var(--good)}
-.chips{display:flex;flex-wrap:wrap;gap:8px}.chip{background:#F4F6EF;border:1px solid #E8EADF;padding:8px 10px;border-radius:999px;font-size:12px;color:#2B302D;font-weight:650}.trace{font-family:"SF Mono",ui-monospace,Menlo,monospace;background:#0F1412;color:#DDE8D8;border-radius:18px;padding:14px;font-size:12px;line-height:1.5;overflow-x:auto;white-space:pre-wrap}.eval-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.score{background:#F5F7F0;border-radius:17px;padding:12px}.score .num{font-size:24px;font-weight:850;letter-spacing:-.05em}.score .label{color:var(--muted);font-size:12px;margin-top:2px}.disclaimer{color:var(--muted);font-size:11px;line-height:1.4;margin-top:10px;text-align:center}
-@media(max-width:900px){.shell{grid-template-columns:1fr}.right{max-height:none;border-top:1px solid var(--line)}.left{min-height:auto;border-right:0}.examples{grid-template-columns:1fr}.bubble{max-width:90%}}
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ava — Money decisions made with confidence</title>
+  <meta name="description" content="Ava financial agent demo with Agent Observatory." />
+  <style>
+    :root{
+      --lime:#D8FF3E;
+      --lime-soft:#F4FFD7;
+      --ink:#070A09;
+      --muted:#6B716E;
+      --line:#E7EADF;
+      --panel:#FFFFFF;
+      --soft:#FAFBF7;
+      --green:#148A38;
+      --orange:#FF6B26;
+      --blue:#2F80ED;
+      --purple:#8B5CF6;
+      --shadow:0 18px 45px rgba(7,10,9,.07);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      background:
+        radial-gradient(circle at 10% 0%, rgba(216,255,62,.28), transparent 24%),
+        #fff;
+      color:var(--ink);
+      font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Inter","Segoe UI",sans-serif;
+      -webkit-font-smoothing:antialiased;
+    }
+    .page{
+      min-height:100vh;
+      display:grid;
+      grid-template-columns:minmax(420px, .95fr) minmax(460px, 1.05fr);
+      gap:20px;
+      padding:22px;
+    }
+    .app,.observatory{
+      background:rgba(255,255,255,.92);
+      border:1px solid var(--line);
+      border-radius:28px;
+      box-shadow:var(--shadow);
+      overflow:hidden;
+      min-height:calc(100vh - 44px);
+    }
+
+    /* Ava app */
+    .app{
+      display:flex;
+      flex-direction:column;
+      padding:26px;
+    }
+    .app-header,.obs-header{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:16px;
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      font-size:34px;
+      font-weight:850;
+      letter-spacing:-.06em;
+      line-height:1;
+    }
+    .brand-dot{
+      width:38px;height:38px;border-radius:50%;
+      background:var(--lime);
+      position:relative;
+      box-shadow:0 0 36px rgba(216,255,62,.72);
+      flex:0 0 auto;
+    }
+    .brand-dot:after{
+      content:"";
+      position:absolute;
+      width:10px;height:10px;border-radius:50%;
+      background:var(--ink);
+      left:50%;top:50%;
+      transform:translate(-50%,-50%);
+    }
+    .tagline{
+      color:#3E4441;
+      font-size:15px;
+      margin-top:7px;
+      letter-spacing:-.012em;
+    }
+    .voice-menu{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      border:1px solid var(--line);
+      border-radius:999px;
+      padding:8px 13px 8px 8px;
+      background:white;
+      box-shadow:0 10px 22px rgba(0,0,0,.04);
+      cursor:pointer;
+      user-select:none;
+      font-weight:750;
+      position:relative;
+    }
+    .speaker-icon{
+      width:34px;height:34px;border-radius:50%;
+      background:var(--lime);
+      display:grid;
+      place-items:center;
+    }
+    .speaker-icon svg{width:18px;height:18px}
+    .voice-dropdown{
+      position:absolute;
+      right:0;
+      top:48px;
+      width:245px;
+      background:white;
+      border:1px solid var(--line);
+      border-radius:18px;
+      box-shadow:0 20px 50px rgba(0,0,0,.12);
+      padding:8px;
+      z-index:10;
+      display:none;
+    }
+    .voice-menu.open .voice-dropdown{display:block}
+    .voice-option{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      padding:11px 12px;
+      border-radius:13px;
+      font-size:14px;
+      font-weight:650;
+    }
+    .voice-option:hover{background:#F4F6EF}
+    .voice-sub{display:block;color:var(--muted);font-weight:450;font-size:12px;margin-top:2px}
+    .divider{height:1px;background:var(--line);margin:6px 0}
+
+    .suggestions{
+      padding-top:28px;
+    }
+    .section-title{
+      font-size:15px;
+      font-weight:750;
+      margin:0 0 13px;
+      letter-spacing:-.012em;
+    }
+    .suggestion-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+    }
+    .suggestion{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.8);
+      border-radius:18px;
+      padding:14px 16px;
+      min-height:78px;
+      cursor:pointer;
+      transition:.15s ease;
+      font-size:16px;
+      line-height:1.28;
+      letter-spacing:-.02em;
+    }
+    .suggestion:hover{
+      transform:translateY(-1px);
+      background:var(--lime-soft);
+      border-color:#D7E9A2;
+    }
+    .s-left{display:flex;align-items:center;gap:13px}
+    .s-icon{
+      width:42px;height:42px;border-radius:50%;
+      background:#F0F9D8;
+      color:#6BA312;
+      display:grid;
+      place-items:center;
+      flex:0 0 auto;
+    }
+    .chev{font-size:24px;line-height:1;color:#111}
+
+    .money-event{
+      margin-top:20px;
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:16px;
+      background:#fff;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+    }
+    .money-label{
+      color:var(--muted);
+      font-size:12px;
+      font-weight:850;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      margin-bottom:5px;
+    }
+    .amount{
+      font-size:32px;
+      font-weight:850;
+      letter-spacing:-.055em;
+    }
+    .pill{
+      background:var(--lime);
+      border-radius:10px;
+      padding:8px 11px;
+      font-size:13px;
+      font-weight:800;
+    }
+
+    .chat{
+      margin-top:20px;
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+      flex:1;
+      min-height:250px;
+      overflow:auto;
+      padding-bottom:14px;
+    }
+    .msg-row{display:flex;gap:10px;align-items:flex-start}
+    .msg-row.user{justify-content:flex-end}
+    .avatar{
+      width:30px;height:30px;border-radius:50%;
+      background:var(--lime);
+      position:relative;
+      flex:0 0 auto;
+      margin-top:2px;
+    }
+    .avatar:after{
+      content:"";
+      position:absolute;
+      width:8px;height:8px;border-radius:50%;
+      background:var(--ink);
+      left:50%;top:50%;
+      transform:translate(-50%,-50%);
+    }
+    .message{
+      max-width:78%;
+      border:1px solid rgba(231,234,223,.65);
+      background:linear-gradient(135deg,#fff,#FAFBF5);
+      border-radius:19px;
+      padding:14px 16px;
+      line-height:1.45;
+      font-size:15px;
+      white-space:pre-wrap;
+      box-shadow:0 10px 24px rgba(0,0,0,.04);
+      letter-spacing:-.01em;
+    }
+    .msg-meta{
+      font-size:13px;
+      color:var(--muted);
+      margin-bottom:7px;
+    }
+    .msg-meta b{color:var(--ink);margin-right:10px}
+    .user .message{
+      background:#F5F7FB;
+      border-color:#EDF1F8;
+    }
+
+    .input-wrap{
+      border:1.5px solid #DDE2D1;
+      border-radius:26px;
+      background:white;
+      padding:8px 10px 8px 18px;
+      box-shadow:0 18px 50px rgba(0,0,0,.08);
+    }
+    .inputbar{
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+    input{
+      flex:1;
+      border:0;
+      outline:none;
+      background:transparent;
+      color:var(--ink);
+      font-size:18px;
+      padding:15px 8px;
+    }
+    input::placeholder{color:#8A8F8C}
+    button{
+      border:0;
+      cursor:pointer;
+      font-family:inherit;
+    }
+    .wave-btn,.send-btn{
+      width:54px;height:54px;border-radius:50%;
+      display:grid;
+      place-items:center;
+      flex:0 0 auto;
+      transition:.16s ease;
+    }
+    .wave-btn{
+      background:var(--lime);
+      box-shadow:0 0 0 8px rgba(216,255,62,.16);
+    }
+    .wave-btn:hover{
+      transform:translateY(-1px);
+      box-shadow:0 0 0 10px rgba(216,255,62,.22),0 0 26px rgba(216,255,62,.45);
+    }
+    .send-btn{
+      background:#F0F1EF;
+      color:var(--ink);
+    }
+    .send-btn svg{width:24px;height:24px}
+    .wave{
+      display:flex;
+      gap:3px;
+      align-items:center;
+      justify-content:center;
+      width:30px;height:26px;
+    }
+    .wave i{
+      width:3px;border-radius:999px;background:var(--ink);
+      display:block;
+    }
+    .wave i:nth-child(1){height:10px}
+    .wave i:nth-child(2){height:18px}
+    .wave i:nth-child(3){height:25px}
+    .wave i:nth-child(4){height:18px}
+    .wave i:nth-child(5){height:10px}
+    .wave-btn.listening{
+      background:#ff2d2d;
+      box-shadow:0 0 0 12px rgba(255,45,45,.16),0 0 38px rgba(255,45,45,.55);
+      animation:pulse 1.15s ease-in-out infinite;
+    }
+    .wave-btn.listening .wave i{
+      background:white;
+      animation:wave 0.7s ease-in-out infinite;
+    }
+    .wave-btn.listening .wave i:nth-child(2){animation-delay:.08s}
+    .wave-btn.listening .wave i:nth-child(3){animation-delay:.16s}
+    .wave-btn.listening .wave i:nth-child(4){animation-delay:.24s}
+    .wave-btn.listening .wave i:nth-child(5){animation-delay:.32s}
+    @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+    @keyframes wave{0%,100%{transform:scaleY(.55)}50%{transform:scaleY(1.15)}}
+    .transcript{
+      text-align:center;
+      color:var(--muted);
+      font-size:12px;
+      min-height:18px;
+      margin-top:8px;
+    }
+
+    /* Observatory */
+    .observatory{
+      padding:0;
+      background:#FCFDFB;
+    }
+    .obs-header{
+      padding:24px 26px 14px;
+    }
+    .obs-title{
+      font-size:25px;
+      font-weight:850;
+      letter-spacing:-.04em;
+      margin:0;
+    }
+    .obs-sub{
+      color:var(--muted);
+      margin-top:5px;
+      font-size:14px;
+    }
+    .live{
+      display:flex;
+      align-items:center;
+      gap:7px;
+      border:1px solid var(--line);
+      background:white;
+      border-radius:999px;
+      padding:8px 12px;
+      font-size:13px;
+      font-weight:750;
+    }
+    .live-dot{
+      width:8px;height:8px;border-radius:50%;
+      background:#30B45B;
+    }
+    .tabs{
+      display:flex;
+      gap:28px;
+      border-bottom:1px solid var(--line);
+      padding:0 26px;
+      margin-top:8px;
+    }
+    .tab{
+      padding:15px 0 13px;
+      color:#4D5350;
+      font-weight:700;
+      font-size:14px;
+      position:relative;
+    }
+    .tab.active{color:var(--ink)}
+    .tab.active:after{
+      content:"";
+      position:absolute;left:0;right:0;bottom:-1px;
+      height:3px;border-radius:999px;
+      background:var(--lime);
+    }
+    .obs-body{
+      padding:20px 22px 24px;
+      display:grid;
+      gap:16px;
+    }
+    .obs-grid{
+      display:grid;
+      grid-template-columns:1.4fr .72fr;
+      gap:16px;
+    }
+    .obs-card{
+      border:1px solid var(--line);
+      background:white;
+      border-radius:18px;
+      padding:16px;
+      box-shadow:0 10px 24px rgba(0,0,0,.035);
+    }
+    .obs-card h3{
+      margin:0 0 13px;
+      font-size:15px;
+      letter-spacing:-.02em;
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+    .mini-icon{
+      width:24px;height:24px;border-radius:8px;
+      display:inline-grid;place-items:center;
+      background:#EEF7FF;color:var(--blue);
+      font-size:13px;
+    }
+    .mini-icon.purple{background:#F3EEFF;color:var(--purple)}
+    .mini-icon.green{background:#EAF8EE;color:var(--green)}
+    .mini-icon.orange{background:#FFF2E9;color:var(--orange)}
+    .kv{
+      display:grid;
+      gap:10px;
+    }
+    .row{
+      display:flex;
+      justify-content:space-between;
+      gap:18px;
+      border-bottom:1px solid #EFF1EC;
+      padding-bottom:9px;
+      font-size:13px;
+    }
+    .row:last-child{border-bottom:0;padding-bottom:0}
+    .key{color:var(--muted)}
+    .value{font-weight:800;text-align:right}
+    .confidence-number{
+      color:var(--green);
+      font-size:46px;
+      font-weight:900;
+      letter-spacing:-.08em;
+      margin-top:18px;
+    }
+    .confidence-copy{
+      color:var(--green);
+      font-size:13px;
+      font-weight:800;
+      margin-top:2px;
+    }
+    .bar-row{margin:12px 0}
+    .bar-top{
+      display:flex;
+      justify-content:space-between;
+      font-size:13px;
+      margin-bottom:7px;
+    }
+    .bar-bg{
+      height:8px;border-radius:999px;background:#EAEBE7;
+      overflow:hidden;
+    }
+    .bar{
+      height:100%;
+      border-radius:999px;
+      background:var(--green);
+      transition:width .35s ease;
+    }
+    .bar.lime{background:var(--lime)}
+    .bar.orange{background:var(--orange)}
+    .bar.black{background:var(--ink)}
+    .memory-grid{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+    }
+    .chip{
+      background:#F4F5F1;
+      border-radius:9px;
+      padding:7px 10px;
+      font-size:12px;
+      color:#202623;
+    }
+    .tools{
+      display:grid;gap:10px;
+      font-family:"SF Mono", ui-monospace, Menlo, monospace;
+      font-size:12px;
+    }
+    .tool{
+      display:flex;justify-content:space-between;gap:12px;
+    }
+    .ok{color:#34A853;font-weight:900}
+    .eval-grid{
+      display:grid;
+      grid-template-columns:repeat(5,1fr);
+      gap:12px;
+      align-items:center;
+    }
+    .eval-metric .num{
+      font-size:22px;font-weight:850;letter-spacing:-.05em;
+    }
+    .eval-metric .label{
+      color:var(--muted);font-size:12px;margin-top:3px;
+    }
+    .circle{
+      justify-self:end;
+      width:78px;height:78px;border-radius:50%;
+      display:grid;place-items:center;
+      border:5px solid #61BF63;
+      font-weight:900;
+      font-size:22px;
+    }
+    .circle span{display:block;font-size:10px;color:var(--muted);font-weight:650;text-align:center}
+
+    @media(max-width:980px){
+      .page{grid-template-columns:1fr;padding:12px}
+      .app,.observatory{min-height:auto}
+      .suggestion-grid,.obs-grid{grid-template-columns:1fr}
+      .eval-grid{grid-template-columns:repeat(2,1fr)}
+      .circle{justify-self:start}
+    }
+    @media(max-width:520px){
+      .app,.observatory{border-radius:20px}
+      .app{padding:18px}
+      .brand{font-size:30px}
+      .suggestion{font-size:15px}
+      .message{max-width:88%}
+      .input-wrap{border-radius:22px}
+      .tabs{gap:18px;overflow:auto}
+    }
+  
+/* Final voice picker */
+.voice-menu{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  border:1px solid var(--line);
+  border-radius:999px;
+  padding:8px 14px 8px 8px;
+  background:white;
+  box-shadow:0 10px 22px rgba(0,0,0,.04);
+  cursor:pointer;
+  user-select:none;
+  font-weight:800;
+  position:relative;
+}
+.speaker-icon{
+  width:34px;height:34px;border-radius:50%;
+  background:var(--lime);
+  display:grid;
+  place-items:center;
+}
+.speaker-icon svg{width:18px;height:18px}
+.voice-dropdown{
+  position:absolute;
+  right:0;
+  top:52px;
+  width:286px;
+  background:white;
+  border:1px solid var(--line);
+  border-radius:20px;
+  box-shadow:0 22px 60px rgba(0,0,0,.13);
+  padding:12px;
+  z-index:20;
+  display:none;
+}
+.voice-menu.open .voice-dropdown{display:block}
+.voice-dropdown-title{
+  font-weight:850;
+  font-size:15px;
+  letter-spacing:-.02em;
+  padding:6px 8px 10px;
+}
+.voice-choice{
+  display:grid;
+  grid-template-columns:22px 1fr;
+  gap:10px;
+  align-items:start;
+  padding:12px 10px;
+  border-radius:15px;
+  font-size:15px;
+  font-weight:800;
+}
+.voice-choice:hover{background:#F4F6EF}
+.voice-choice.active{background:#F7FBEF}
+.radio{
+  width:16px;height:16px;border-radius:50%;
+  border:2px solid #9AA09C;
+  margin-top:2px;
+  position:relative;
+}
+.voice-choice.active .radio{
+  border-color:var(--ink);
+  background:var(--lime);
+}
+.voice-choice.active .radio:after{
+  content:"";
+  position:absolute;
+  inset:3px;
+  border-radius:50%;
+  background:var(--ink);
+}
+.voice-desc{
+  display:block;
+  color:var(--muted);
+  font-weight:520;
+  font-size:13px;
+  margin-top:3px;
+}
+.voice-current{
+  display:inline-block;
+  margin-top:7px;
+  color:var(--green);
+  font-weight:800;
+  font-size:12px;
+}
+.voice-muted{
+  opacity:.55;
+}
+
+
+/* Final fit-in-one-page layout */
+.page{
+  height:100vh;
+  min-height:100vh;
+  overflow:hidden;
+  padding:16px;
+}
+.app,.observatory{
+  height:calc(100vh - 32px);
+  min-height:0;
+}
+.app{
+  padding:22px;
+  overflow:hidden;
+}
+.brand{font-size:30px}
+.brand-dot{width:34px;height:34px}
+.tagline{font-size:14px}
+.suggestions{padding-top:22px}
+.suggestion-grid{gap:10px}
+.suggestion{
+  min-height:64px;
+  padding:12px 14px;
+  font-size:15px;
+}
+.s-icon{width:36px;height:36px}
+.money-event{
+  margin-top:16px;
+  padding:13px 16px;
+}
+.amount{font-size:29px}
+.chat{
+  flex:1;
+  min-height:0;
+  overflow-y:auto;
+  margin-top:14px;
+  gap:10px;
+  padding-right:4px;
+}
+.message{
+  padding:12px 14px;
+  font-size:14px;
+  max-width:82%;
+}
+.msg-meta{font-size:12px;margin-bottom:6px}
+.input-wrap{
+  margin-top:10px;
+  flex:0 0 auto;
+}
+input{
+  font-size:16px;
+  padding:12px 6px;
+}
+.wave-btn,.send-btn{
+  width:48px;
+  height:48px;
+}
+.transcript{
+  flex:0 0 auto;
+  margin-top:6px;
+}
+.observatory{
+  overflow:hidden;
+}
+.obs-header{
+  padding:20px 22px 10px;
+}
+.obs-title{font-size:23px}
+.obs-sub{font-size:13px}
+.tabs{
+  padding:0 22px;
+  gap:24px;
+}
+.tab{
+  padding:12px 0 10px;
+}
+.obs-body{
+  height:calc(100% - 132px);
+  overflow-y:auto;
+  padding:16px 18px 20px;
+  gap:12px;
+}
+.obs-grid{gap:12px}
+.obs-card{
+  padding:14px;
+}
+.confidence-number{
+  font-size:38px;
+  margin-top:10px;
+}
+.bar-row{margin:9px 0}
+.voice-choice.off-choice.active{
+  background:#F3F5EF;
+}
+.voice-choice.off-choice .radio{
+  border-color:#767C78;
+}
+.voice-choice.off-choice.active .radio{
+  background:#111;
+  border-color:#111;
+}
+.voice-choice.off-choice.active .radio:after{
+  background:white;
+}
+.voice-choice.off-choice.active .voice-current{
+  color:#555;
+}
+@media(max-width:980px){
+  .page{
+    height:auto;
+    min-height:100vh;
+    overflow:auto;
+  }
+  .app,.observatory{
+    height:auto;
+    min-height:auto;
+  }
+}
+
 </style>
+
+
+
+
+<style id="ava-selected-preview-final">
+:root{
+  --lime:#C9F938!important;
+  --lime-soft:#F4FBE9!important;
+  --ink:#080A09!important;
+  --muted:#5F6662!important;
+  --line:#E8EBE4!important;
+  --panel:#FFFFFF!important;
+  --soft:#FAFAF7!important;
+  --green:#0B8F2F!important;
+}
+body{
+  background:#FAFAF7!important;
+}
+.page{
+  height:100vh!important;
+  min-height:100vh!important;
+  overflow:hidden!important;
+  padding:12px!important;
+  gap:12px!important;
+  grid-template-columns:minmax(460px,.92fr) minmax(520px,1.08fr)!important;
+}
+.app,.observatory{
+  height:calc(100vh - 24px)!important;
+  min-height:0!important;
+  border-radius:18px!important;
+  border:1px solid var(--line)!important;
+  box-shadow:0 8px 22px rgba(0,0,0,.035)!important;
+  background:#fff!important;
+  overflow:hidden!important;
+}
+.app{
+  padding:22px!important;
+}
+.app-header{
+  align-items:center!important;
+  padding-bottom:16px!important;
+}
+.app-header>div:first-child{
+  display:flex!important;
+  align-items:center!important;
+  gap:18px!important;
+  min-width:0!important;
+}
+.brand{
+  font-size:32px!important;
+  font-weight:850!important;
+  letter-spacing:-.055em!important;
+  gap:12px!important;
+  white-space:nowrap!important;
+}
+.brand-dot{
+  width:32px!important;
+  height:32px!important;
+  border-radius:50%!important;
+  background:#fff!important;
+  border:2px solid var(--lime)!important;
+  box-shadow:none!important;
+  flex:0 0 auto!important;
+}
+.brand-dot:after{display:none!important}
+.tagline{
+  margin-top:0!important;
+  font-size:14px!important;
+  color:#3D4440!important;
+  white-space:nowrap!important;
+  letter-spacing:-.01em!important;
+}
+.voice-menu{
+  border-radius:999px!important;
+  padding:7px 12px 7px 7px!important;
+  gap:9px!important;
+  box-shadow:0 4px 14px rgba(0,0,0,.035)!important;
+  flex:0 0 auto!important;
+}
+.speaker-icon{
+  width:30px!important;
+  height:30px!important;
+  background:var(--lime-soft)!important;
+  color:var(--green)!important;
+}
+.voice-dropdown{
+  width:260px!important;
+  border-radius:18px!important;
+  box-shadow:0 18px 40px rgba(0,0,0,.12)!important;
+}
+.suggestions{padding-top:16px!important}
+.section-title{
+  font-size:14px!important;
+  margin-bottom:12px!important;
+}
+.suggestion-grid{
+  grid-template-columns:1fr 1fr!important;
+  gap:12px!important;
+}
+.suggestion:nth-child(n+3){display:none!important}
+.suggestion{
+  min-height:74px!important;
+  padding:14px!important;
+  border-radius:16px!important;
+  font-size:15px!important;
+  background:#fff!important;
+}
+.s-icon{
+  width:40px!important;
+  height:40px!important;
+  background:#EEF8D9!important;
+  color:var(--green)!important;
+}
+.money-event{
+  margin-top:20px!important;
+  padding:12px 14px!important;
+  border-radius:16px!important;
+  min-height:54px!important;
+}
+.money-event>div:first-child{
+  display:flex!important;
+  align-items:center!important;
+  gap:10px!important;
+}
+.money-label{display:none!important}
+.amount{
+  font-size:22px!important;
+  letter-spacing:-.04em!important;
+}
+.amount::before{
+  content:"$";
+  display:inline-grid;
+  place-items:center;
+  width:30px;
+  height:30px;
+  border-radius:50%;
+  background:#EEF8D9;
+  color:var(--green);
+  font-size:17px;
+  margin-right:10px;
+  font-weight:800;
+}
+.amount::after{
+  content:" New cash";
+  font-size:14px;
+  color:var(--muted);
+  font-weight:650;
+  margin-left:10px;
+  letter-spacing:0;
+}
+.pill{
+  background:#F1F8E7!important;
+  color:var(--green)!important;
+  padding:7px 12px!important;
+  border-radius:999px!important;
+}
+.chat{
+  margin-top:18px!important;
+  flex:1!important;
+  min-height:0!important;
+  overflow:hidden!important;
+  gap:16px!important;
+  padding:0!important;
+}
+.avatar{display:none!important}
+.msg-meta{
+  display:block!important;
+  font-size:0!important;
+  margin:0 0 10px!important;
+}
+.msg-meta b{
+  font-size:14px!important;
+  color:var(--green)!important;
+  margin:0!important;
+}
+.msg-meta{color:transparent!important}
+.message{
+  max-width:66%!important;
+  padding:18px 20px!important;
+  border-radius:16px!important;
+  font-size:15px!important;
+  line-height:1.55!important;
+  box-shadow:none!important;
+  border:1px solid #EDF0E6!important;
+}
+.msg-row.user{
+  justify-content:flex-end!important;
+}
+.user .message{
+  background:#F7F8FA!important;
+  border-color:#EEF0F2!important;
+  max-width:50%!important;
+}
+.input-wrap{
+  flex:0 0 auto!important;
+  margin-top:12px!important;
+  border:1px solid #E4E7E2!important;
+  border-radius:16px!important;
+  padding:9px 12px 9px 16px!important;
+  box-shadow:0 8px 22px rgba(0,0,0,.045)!important;
+}
+input{
+  font-size:15px!important;
+  padding:12px 6px!important;
+}
+.wave-btn,.send-btn{
+  width:46px!important;
+  height:46px!important;
+}
+.wave-btn{
+  background:var(--lime)!important;
+  box-shadow:none!important;
+}
+.send-btn{
+  background:#fff!important;
+  border:1px solid var(--line)!important;
+}
+.transcript{display:none!important}
+
+/* Observatory selected-preview tuning */
+.observatory{padding:0!important}
+.obs-header{
+  padding:22px 26px 8px!important;
+}
+.obs-title{
+  font-size:24px!important;
+}
+.tabs{
+  padding:0 26px!important;
+  gap:32px!important;
+}
+.tab{
+  padding:13px 0 12px!important;
+}
+.tab.active:after{
+  background:var(--green)!important;
+  height:3px!important;
+}
+.obs-body{
+  height:calc(100% - 126px)!important;
+  overflow:hidden!important;
+  padding:16px!important;
+  gap:12px!important;
+}
+.obs-grid{gap:12px!important}
+.obs-card{
+  padding:14px!important;
+  border-radius:16px!important;
+  box-shadow:none!important;
+}
+.obs-card h3{
+  margin-bottom:10px!important;
+  font-size:14px!important;
+}
+.row{
+  padding-bottom:8px!important;
+  font-size:12px!important;
+}
+.confidence-number{
+  font-size:42px!important;
+  margin-top:8px!important;
+  color:var(--green)!important;
+}
+.bar-row{margin:8px 0!important}
+.bar-bg{height:7px!important}
+.bar{background:var(--green)!important}
+.bar.lime{background:var(--lime)!important}
+.bar.orange{background:#FFB000!important}
+.memory-grid{gap:6px!important}
+.chip{
+  padding:6px 8px!important;
+  font-size:11px!important;
+}
+.tools{gap:7px!important;font-size:11px!important}
+.eval-grid{
+  gap:8px!important;
+}
+.eval-metric .num{
+  font-size:20px!important;
+}
+.circle{
+  width:70px!important;
+  height:70px!important;
+}
+@media(max-width:980px){
+  .page{
+    height:auto!important;
+    min-height:100vh!important;
+    overflow:auto!important;
+    grid-template-columns:1fr!important;
+  }
+  .app,.observatory{
+    height:auto!important;
+  }
+}
+</style>
+
 </head>
 <body>
-<div class="shell">
-<section class="left">
-<header><div><div class="brand"><div class="dot"></div>Ava</div><div class="tag">Money decisions made with confidence.</div></div><div class="voice-toggle">Voice<div id="voiceSwitch" class="switch"><div class="knob"></div></div></div></header>
-<section class="hero"><h1>The person you talk to before making a money decision.</h1><p>Ask Ava about investing new cash, portfolio risk, deposits, or whether a decision fits your goals.</p><div class="examples">
-<div class="example" data-prompt="How much have I deposited this year?">“How much have I deposited this year?”</div>
-<div class="example" data-prompt="I got $500 today. What should I do with it?">“I got $500 today. What should I do with it?”</div>
-<div class="example" data-prompt="Should I buy more QQQ?">“Should I buy more QQQ?”</div>
-<div class="example" data-prompt="Am I too concentrated in AI and tech?">“Am I too concentrated in AI and tech?”</div>
-</div></section>
-<section class="money-card"><div><div class="money-label">Today’s money event</div><div class="amount">+$500</div></div><div class="pill">New cash</div></section>
-<section id="chat" class="chat"><div class="bubble ava"><div class="speaker">Ava · Calm guide</div>Hi Albert.
+  <main class="page">
+    <section class="app">
+      <header class="app-header">
+        <div>
+          <div class="brand"><div class="brand-dot"></div>Ava</div>
+          <div class="tagline">Money decisions made with confidence.</div>
+        </div>
 
+        <div id="voiceMenu" class="voice-menu">
+          <div class="speaker-icon" id="speakerIcon">
+            <svg id="speakerSvg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M11 5 6 9H3v6h3l5 4V5z"></path>
+              <path id="speakerWave" d="M15.5 8.5a5 5 0 0 1 0 7"></path>
+            </svg>
+          </div>
+          <span id="voiceLabel">Aaron</span>
+          <span>⌄</span>
+          <div class="voice-dropdown" id="voiceDropdown">
+            <div class="voice-dropdown-title">Choose Ava's voice</div>
+            <div class="voice-choice off-choice" data-voice-key="Off" data-voice-name="" data-label="Off">
+              <span class="radio"></span>
+              <div>Off<span class="voice-desc">Text only</span></div>
+            </div>
+            <div class="voice-choice active" data-voice-key="Aaron" data-voice-name="Aaron" data-label="Aaron">
+              <span class="radio"></span>
+              <div>Aaron<span class="voice-desc">Calm male</span><span class="voice-current">Current voice</span></div>
+            </div>
+            <div class="voice-choice" data-voice-key="Samantha" data-voice-name="Samantha" data-label="Samantha">
+              <span class="radio"></span>
+              <div>Samantha<span class="voice-desc">Warm female</span></div>
+            </div>
+            <div class="voice-choice" data-voice-key="Daniel" data-voice-name="Daniel" data-label="Daniel">
+              <span class="radio"></span>
+              <div>Daniel<span class="voice-desc">British</span></div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <section class="suggestions">
+        <div class="section-title">Suggested questions</div>
+        <div class="suggestion-grid">
+          <div class="suggestion" data-prompt="How much have I deposited this year?">
+            <div class="s-left"><span class="s-icon">↗</span><span>How much have I deposited this year?</span></div><span class="chev">›</span>
+          </div>
+          <div class="suggestion" data-prompt="I got $500 today. What should I do with it?">
+            <div class="s-left"><span class="s-icon">▣</span><span>I got $500 today. What should I do with it?</span></div><span class="chev">›</span>
+          </div>
+          <div class="suggestion" data-prompt="Should I buy more QQQ?">
+            <div class="s-left"><span class="s-icon">⌕</span><span>Should I buy more QQQ?</span></div><span class="chev">›</span>
+          </div>
+          <div class="suggestion" data-prompt="Am I too concentrated in AI and tech?">
+            <div class="s-left"><span class="s-icon">◔</span><span>Am I too concentrated in AI and tech?</span></div><span class="chev">›</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="money-event">
+        <div>
+          <div class="money-label">Today’s money event</div>
+          <div class="amount">+$500</div>
+        </div>
+        <div class="pill">New cash</div>
+      </section>
+
+      <section id="chat" class="chat">
+        <div class="msg-row">
+          <div class="avatar"></div>
+          <div class="message">
+            <div class="msg-meta"><b>Ava</b>10:42 AM</div>
 I noticed you received $500 today.
 
-What were you thinking of doing with this money?</div></section>
-<form id="inputForm" class="inputbar"><button id="mic" class="mic" type="button" title="Talk">◉</button><input id="textInput" placeholder="Ask Ava..." autocomplete="off"/><button type="submit">Send</button></form>
-<div id="transcript" class="transcript">Tap ◉ to talk, or type a question.</div>
-<select id="voiceSelect" class="voice-select"></select>
-<div class="disclaimer">Prototype only. Uses sample financial data. Not personalized financial, tax, or legal advice.</div>
-</section>
-<aside class="right">
-<div class="console-title"><div><h2>Decision Compass</h2><div class="tag">Agent observability demo</div></div><div class="live"><span class="live-dot"></span>Live trace</div></div>
-<section class="obs-card"><h3>Current intent</h3><div class="kv">
-<div class="row"><div class="key">Intent</div><div id="intent" class="value">Cash allocation</div></div>
-<div class="row"><div class="key">User goal</div><div id="goal" class="value">Buy a home</div></div>
-<div class="row"><div class="key">Decision stage</div><div id="stage" class="value">Clarify motivation</div></div>
-<div class="row"><div class="key">Recommended next step</div><div id="nextStep" class="value">Ask follow-up</div></div>
-</div></section>
-<section class="obs-card"><h3>Decision factors</h3>
-<div class="bar-row"><div class="bar-top"><span>Goal alignment</span><strong id="goalVal">78%</strong></div><div class="bar-bg"><div id="goalBar" class="bar good" style="width:78%"></div></div></div>
-<div class="bar-row"><div class="bar-top"><span>Liquidity need</span><strong id="liqVal">62%</strong></div><div class="bar-bg"><div id="liqBar" class="bar lime" style="width:62%"></div></div></div>
-<div class="bar-row"><div class="bar-top"><span>Portfolio concentration</span><strong id="riskVal">70%</strong></div><div class="bar-bg"><div id="riskBar" class="bar risk" style="width:70%"></div></div></div>
-<div class="bar-row"><div class="bar-top"><span>Recommendation confidence</span><strong id="confVal">82%</strong></div><div class="bar-bg"><div id="confBar" class="bar" style="width:82%"></div></div></div>
-</section>
-<section class="obs-card"><h3>Retrieved memory</h3><div class="chips"><div class="chip">Saving for a home</div><div class="chip">AI-heavy portfolio</div><div class="chip">Prefers clear tradeoffs</div><div class="chip">Uses Robinhood frequently</div></div></section>
-<section class="obs-card"><h3>Conversation evals</h3><div class="eval-grid"><div class="score"><div id="depthScore" class="num">1</div><div class="label">Turns</div></div><div class="score"><div id="followScore" class="num">—</div><div class="label">Follow-up answered</div></div><div class="score"><div class="num">Yes</div><div class="label">Memory used</div></div><div class="score"><div class="num">Low</div><div class="label">Generic AI tone</div></div></div></section>
-<section class="obs-card"><h3>Trace payload</h3><div id="trace" class="trace">{
-  "agent": "Ava",
-  "intent": "cash_allocation",
-  "retrieved_memory": ["home_goal", "ai_heavy_portfolio"],
-  "policy": "ask_before_advising",
-  "next_action": "clarify_user_intent"
-}</div></section>
-</aside></div>
-<script>
-const sample={depositsYTD:12450,monthlyAverageDeposit:1038,techExposure:42,aiExposure:34};
-const chat=document.getElementById("chat"), form=document.getElementById("inputForm"), input=document.getElementById("textInput"), mic=document.getElementById("mic"), transcript=document.getElementById("transcript"), voiceSwitch=document.getElementById("voiceSwitch"), voiceSelect=document.getElementById("voiceSelect");
-let voiceEnabled=true, voices=[], selectedVoiceName="", turns=1, recognition=null, listening=false;
-const E={intent:by("intent"),goal:by("goal"),stage:by("stage"),nextStep:by("nextStep"),goalVal:by("goalVal"),liqVal:by("liqVal"),riskVal:by("riskVal"),confVal:by("confVal"),goalBar:by("goalBar"),liqBar:by("liqBar"),riskBar:by("riskBar"),confBar:by("confBar"),depthScore:by("depthScore"),followScore:by("followScore"),trace:by("trace")};
-function by(id){return document.getElementById(id)} function money(n){return "$"+n.toLocaleString()}
-function classify(t){const q=t.toLowerCase(); if(q.includes("deposit"))return"deposits"; if(q.includes("qqq")||q.includes("buy more"))return"qqq"; if(q.includes("concentrated")||q.includes("tech")||q.includes("ai"))return"concentration"; if(q.includes("500")||q.includes("bonus")||q.includes("cash")||q.includes("money"))return"cash"; if(q.includes("afford"))return"afford"; return"general"}
-function replyFor(type){if(type==="deposits")return `You've deposited ${money(sample.depositsYTD)} into Robinhood this year.
+What were you thinking of doing with this money?
+          </div>
+        </div>
+      </section>
+
+      <div class="input-wrap">
+        <form id="inputForm" class="inputbar">
+          <input id="textInput" placeholder="Ask Ava..." autocomplete="off" />
+          <button id="mic" class="wave-btn" type="button" title="Click the wave button to speak" aria-label="Click the wave button to speak">
+            <span class="wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
+          </button>
+          <button class="send-btn" type="submit" title="Send" aria-label="Send">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 19V5"></path>
+              <path d="m5 12 7-7 7 7"></path>
+            </svg>
+          </button>
+        </form>
+      </div>
+      <div id="transcript" class="transcript">Click the wave button to speak, or type your question.</div>
+    </section>
+
+    <aside class="observatory">
+      <header class="obs-header">
+        <div>
+          <h1 class="obs-title">Agent Observatory</h1>
+          <div class="obs-sub">Real-time insights into Ava’s reasoning and performance</div>
+        </div>
+        <div class="live"><span class="live-dot"></span>Live</div>
+      </header>
+
+      <nav class="tabs">
+        <div class="tab active">Overview</div>
+        <div class="tab">Trace</div>
+        <div class="tab">Memory</div>
+        <div class="tab">Tools</div>
+        <div class="tab">Evaluations</div>
+      </nav>
+
+      <section class="obs-body">
+        <div class="obs-grid">
+          <div class="obs-card">
+            <h3><span class="mini-icon purple">✦</span>Current intent</h3>
+            <div class="kv">
+              <div class="row"><div class="key">Intent</div><div id="intent" class="value">Cash allocation</div></div>
+              <div class="row"><div class="key">User goal</div><div id="goal" class="value">Decide what to do with $500</div></div>
+              <div class="row"><div class="key">Decision stage</div><div id="stage" class="value">Clarify motivation</div></div>
+              <div class="row"><div class="key">Recommended next step</div><div id="nextStep" class="value">Provide options</div></div>
+            </div>
+          </div>
+
+          <div class="obs-card">
+            <h3><span class="mini-icon green">↟</span>Confidence</h3>
+            <div id="confBig" class="confidence-number">82%</div>
+            <div class="confidence-copy">High confidence</div>
+            <div class="tagline">↑ 12% vs last response</div>
+          </div>
+        </div>
+
+        <div class="obs-card">
+          <h3><span class="mini-icon">▥</span>Decision factors</h3>
+          <div class="bar-row">
+            <div class="bar-top"><span>Goal alignment</span><b id="goalVal">78%</b></div>
+            <div class="bar-bg"><div id="goalBar" class="bar" style="width:78%"></div></div>
+          </div>
+          <div class="bar-row">
+            <div class="bar-top"><span>Liquidity need</span><b id="liqVal">62%</b></div>
+            <div class="bar-bg"><div id="liqBar" class="bar lime" style="width:62%"></div></div>
+          </div>
+          <div class="bar-row">
+            <div class="bar-top"><span>Portfolio concentration</span><b id="riskVal">70%</b></div>
+            <div class="bar-bg"><div id="riskBar" class="bar orange" style="width:70%"></div></div>
+          </div>
+          <div class="bar-row">
+            <div class="bar-top"><span>Risk tolerance</span><b id="tolVal">60%</b></div>
+            <div class="bar-bg"><div id="tolBar" class="bar orange" style="width:60%"></div></div>
+          </div>
+          <div class="bar-row">
+            <div class="bar-top"><span>Recommendation confidence</span><b id="recVal">82%</b></div>
+            <div class="bar-bg"><div id="recBar" class="bar black" style="width:82%"></div></div>
+          </div>
+        </div>
+
+        <div class="obs-grid">
+          <div class="obs-card">
+            <h3><span class="mini-icon">◒</span>Retrieved memory</h3>
+            <div id="memory" class="memory-grid">
+              <span class="chip">Saving for a home (target: Q2 2026)</span>
+              <span class="chip">AI-heavy portfolio</span>
+              <span class="chip">Prefers clear tradeoffs</span>
+              <span class="chip">Uses Robinhood frequently</span>
+            </div>
+          </div>
+
+          <div class="obs-card">
+            <h3><span class="mini-icon purple">⌁</span>Recent tools</h3>
+            <div id="tools" class="tools">
+              <div class="tool"><span>get_account_summary</span><span><span class="ok">●</span> 120ms</span></div>
+              <div class="tool"><span>get_portfolio_analysis</span><span><span class="ok">●</span> 340ms</span></div>
+              <div class="tool"><span>get_recent_transactions</span><span><span class="ok">●</span> 98ms</span></div>
+              <div class="tool"><span>market_news_search</span><span><span class="ok">●</span> 620ms</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="obs-card">
+          <h3><span class="mini-icon orange">🏆</span>Evaluation</h3>
+          <div class="eval-grid">
+            <div class="eval-metric"><div class="num">0.92</div><div class="label">Relevance</div></div>
+            <div class="eval-metric"><div class="num">0.91</div><div class="label">Helpful</div></div>
+            <div class="eval-metric"><div class="num">0.89</div><div class="label">Accuracy</div></div>
+            <div class="eval-metric"><div class="num">0.94</div><div class="label">Clarity</div></div>
+            <div class="circle"><div>0.92<span>Overall</span></div></div>
+          </div>
+        </div>
+      </section>
+    </aside>
+  </main>
+
+  <script>
+    const sample = {
+      depositsYTD: 12450,
+      monthlyAverageDeposit: 1038,
+      techExposure: 42,
+      aiExposure: 34
+    };
+
+    const chat = document.getElementById("chat");
+    const form = document.getElementById("inputForm");
+    const input = document.getElementById("textInput");
+    const mic = document.getElementById("mic");
+    const transcript = document.getElementById("transcript");
+    const voiceMenu = document.getElementById("voiceMenu");
+    const voiceLabel = document.getElementById("voiceLabel");
+    const voiceChoices = document.querySelectorAll(".voice-choice");
+    const speakerWave = document.getElementById("speakerWave");
+
+    let speechOn = true;
+    let voices = [];
+    let selectedVoiceKey = "Aaron";
+    let selectedVoiceName = "";
+    let recognition = null;
+    let listening = false;
+
+    const obs = {
+      intent: document.getElementById("intent"),
+      goal: document.getElementById("goal"),
+      stage: document.getElementById("stage"),
+      nextStep: document.getElementById("nextStep"),
+      confBig: document.getElementById("confBig"),
+      goalVal: document.getElementById("goalVal"),
+      liqVal: document.getElementById("liqVal"),
+      riskVal: document.getElementById("riskVal"),
+      tolVal: document.getElementById("tolVal"),
+      recVal: document.getElementById("recVal"),
+      goalBar: document.getElementById("goalBar"),
+      liqBar: document.getElementById("liqBar"),
+      riskBar: document.getElementById("riskBar"),
+      tolBar: document.getElementById("tolBar"),
+      recBar: document.getElementById("recBar")
+    };
+
+    function money(n){ return "$" + n.toLocaleString(); }
+
+    function classify(text){
+      const q = text.toLowerCase();
+      if(q.includes("deposit")) return "deposits";
+      if(q.includes("qqq") || q.includes("buy more")) return "qqq";
+      if(q.includes("concentrated") || q.includes("tech") || q.includes("ai")) return "concentration";
+      if(q.includes("500") || q.includes("bonus") || q.includes("cash") || q.includes("money")) return "cash";
+      if(q.includes("afford")) return "afford";
+      return "general";
+    }
+
+    function replyFor(type){
+      if(type === "deposits") return `You've deposited ${money(sample.depositsYTD)} into Robinhood this year.
 
 That's about ${money(sample.monthlyAverageDeposit)} per month.
 
 Can I make one observation?
 
 You're saving more consistently than you probably give yourself credit for. The next question is whether those dollars are moving toward the goal you care about most.`;
-if(type==="qqq")return `Interesting.
+
+      if(type === "qqq") return `Interesting.
 
 Is buying more QQQ about your long-term conviction in AI, or does it feel hard watching the market move higher without you?
 
-The reason I ask: your portfolio is already meaningfully tilted toward tech. I would compare two choices:
+I would compare two choices:
 
 Option A: put the full $500 into QQQ.
 Option B: split it — $250 toward QQQ and $250 toward your home fund.
 
 Which one feels more aligned with the future you're trying to fund?`;
-if(type==="concentration")return `Maybe.
+
+      if(type === "concentration") return `Maybe.
 
 About ${sample.techExposure}% of your portfolio is tied to tech, and around ${sample.aiExposure}% is tied to AI-related investments.
 
 That is not automatically bad. The better question is:
 
-If AI underperformed for three to five years, would you still feel okay with this allocation?
+If AI underperformed for three to five years, would you still feel okay with this allocation?`;
 
-If yes, it may be conviction. If no, it may be concentration risk.`;
-if(type==="cash")return `Nice.
+      if(type === "cash") return `Nice.
 
 Before we optimize it, I want to understand the instinct.
 
@@ -112,7 +1340,8 @@ If the home goal is still the priority, my first-pass split would be:
 $250 → Home fund
 $150 → Long-term investing
 $100 → Flex / fun money`;
-if(type==="afford")return `Possibly.
+
+      if(type === "afford") return `Possibly.
 
 I would separate two questions:
 
@@ -120,28 +1349,211 @@ I would separate two questions:
 2. Will you still feel good about the decision next month?
 
 If it does not slow down your home goal or force you to sell investments at a bad time, it may be reasonable.`;
-return `That's worth talking through.
+
+      return `That's worth talking through.
 
 Before I give you a recommendation, what is pulling you toward that option right now — conviction, convenience, fear of missing out, or a specific goal?
 
-The motivation matters because the same action can be smart in one context and impulsive in another.`}
-function obs(type,user,reply){let d={intent:"Money decision",stage:"Clarify motivation",next:"Ask follow-up",g:78,l:62,r:70,c:82,trace:"money_decision",mem:["home_goal","ai_heavy_portfolio","frequent_robinhood_user"]};
-if(type==="deposits")d={intent:"Deposit analysis",stage:"Explain pattern",next:"Connect deposits to goals",g:74,l:65,r:38,c:88,trace:"deposit_query",mem:["deposit_history","home_goal","monthly_savings_pattern"]};
-if(type==="qqq")d={intent:"Evaluate QQQ buy",stage:"Separate conviction vs FOMO",next:"Compare full buy vs split allocation",g:52,l:58,r:76,c:81,trace:"trade_reflection",mem:["ai_heavy_portfolio","qqq_allocation","home_goal"]};
-if(type==="concentration")d={intent:"Portfolio risk analysis",stage:"Stress-test concentration",next:"Ask about sleep-at-night threshold",g:65,l:60,r:82,c:84,trace:"portfolio_concentration",mem:["tech_exposure","ai_exposure","risk_preference"]};
-if(type==="cash")d={intent:"Cash allocation",stage:"Clarify instinct",next:"Offer first-pass split",g:86,l:70,r:44,c:83,trace:"cash_allocation",mem:["new_cash_received","home_goal","long_term_investing"]};
-if(type==="afford")d={intent:"Affordability check",stage:"Separate affordability from regret",next:"Check goal impact",g:68,l:72,r:48,c:79,trace:"affordability_check",mem:["cash_buffer","home_goal","spending_preference"]};
-E.intent.textContent=d.intent; E.stage.textContent=d.stage; E.nextStep.textContent=d.next; setBar("goal",d.g); setBar("liq",d.l); setBar("risk",d.r); setBar("conf",d.c); turns+=2; E.depthScore.textContent=Math.ceil(turns/2); E.followScore.textContent=turns>3?"Yes":"—";
-E.trace.textContent=JSON.stringify({agent:"Ava",intent:d.trace,user_message:user,retrieved_memory:d.mem,decision_factors:{goal_alignment:d.g,liquidity_need:d.l,portfolio_concentration:d.r,recommendation_confidence:d.c},policy:"ask_before_advising",output_style:"professional_friend",response_preview:reply.slice(0,130)+"..."},null,2)}
-function setBar(n,v){E[n+"Val"].textContent=v+"%";E[n+"Bar"].style.width=v+"%"}
-function add(role,text){const b=document.createElement("div");b.className="bubble "+role;b.innerHTML=role==="ava"?`<div class="speaker">Ava · Calm guide</div>${esc(text)}`:esc(text);chat.appendChild(b);b.scrollIntoView({behavior:"smooth",block:"end"})}
-function esc(s){return s.replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll("\n","<br>")}
-function handle(t){const clean=t.trim();if(!clean)return;add("user",clean);input.value="";transcript.textContent="Ava is thinking...";setTimeout(()=>{const type=classify(clean), rep=replyFor(type);add("ava",rep);obs(type,clean,rep);transcript.textContent="Ask a follow-up, or tap ◉ to talk.";speak(rep)},220)}
-form.addEventListener("submit",e=>{e.preventDefault();handle(input.value)}); document.querySelectorAll(".example").forEach(el=>el.onclick=()=>handle(el.dataset.prompt));
-voiceSwitch.onclick=()=>{voiceEnabled=!voiceEnabled;voiceSwitch.classList.toggle("off",!voiceEnabled);if(!voiceEnabled&&speechSynthesis)speechSynthesis.cancel()}
-function loadVoices(){if(!speechSynthesis)return;voices=speechSynthesis.getVoices();const pref=["Alex","Aaron","Samantha","Ava","Allison","Daniel"], filtered=[];pref.forEach(n=>{const v=voices.find(x=>x.name.toLowerCase().includes(n.toLowerCase())&&x.lang.toLowerCase().startsWith("en"));if(v&&!filtered.includes(v))filtered.push(v)});voices.filter(v=>v.lang==="en-US").slice(0,4).forEach(v=>{if(!filtered.includes(v))filtered.push(v)});voiceSelect.innerHTML=""; if(!filtered.length){voiceSelect.innerHTML="<option>Default browser voice</option>";return} filtered.forEach((v,i)=>{const o=document.createElement("option");o.value=v.name;o.textContent=v.name+(/alex|aaron/i.test(v.name)?" · Calm male":/samantha/i.test(v.name)?" · Warm":/allison/i.test(v.name)?" · Direct":" · US English");voiceSelect.appendChild(o);if(i===0)selectedVoiceName=v.name});voiceSelect.value=selectedVoiceName}
-if(window.speechSynthesis){loadVoices();speechSynthesis.onvoiceschanged=loadVoices;voiceSelect.onchange=()=>{selectedVoiceName=voiceSelect.value;speak("Hi. This is Ava's voice.")}}
-function speak(text){if(!voiceEnabled||!speechSynthesis)return;const u=new SpeechSynthesisUtterance(text.replace(/\n+/g," "));u.rate=.91;u.pitch=.94;const v=voices.find(x=>x.name===selectedVoiceName);if(v)u.voice=v;speechSynthesis.cancel();speechSynthesis.speak(u)}
-function setupSTT(){const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){transcript.textContent="Voice input works best in Chrome. Typing works everywhere.";return}recognition=new SR();recognition.continuous=false;recognition.interimResults=true;recognition.lang="en-US";recognition.onstart=()=>{listening=true;mic.classList.add("listening");transcript.textContent="Listening..."};recognition.onresult=e=>{let f="",inter="";for(let i=e.resultIndex;i<e.results.length;i++){const txt=e.results[i][0].transcript;if(e.results[i].isFinal)f+=txt;else inter+=txt}const heard=f||inter;input.value=heard;transcript.textContent=heard?`Heard: “${heard}”`:"Listening...";if(f.trim())setTimeout(()=>handle(f),150)};recognition.onend=()=>{listening=false;mic.classList.remove("listening")};recognition.onerror=()=>{listening=false;mic.classList.remove("listening");transcript.textContent="Could not access mic. You can type instead."}}
-mic.onclick=()=>{if(!recognition)return;if(listening)recognition.stop();else{try{recognition.start()}catch{transcript.textContent="Voice is starting. Try again in a second."}}};setupSTT();
-</script></body></html>
+The motivation matters because the same action can be smart in one context and impulsive in another.`;
+    }
+
+    function updateObs(type){
+      let d = {
+        intent:"Cash allocation", goal:"Decide what to do with $500", stage:"Clarify motivation", next:"Provide options",
+        g:78,l:62,r:70,t:60,c:82
+      };
+      if(type==="deposits") d = {intent:"Deposit analysis", goal:"Understand saving behavior", stage:"Explain pattern", next:"Connect deposits to goals", g:74,l:65,r:38,t:72,c:88};
+      if(type==="qqq") d = {intent:"Evaluate QQQ buy", goal:"Balance growth and home goal", stage:"Separate conviction vs FOMO", next:"Compare full buy vs split allocation", g:52,l:58,r:76,t:60,c:81};
+      if(type==="concentration") d = {intent:"Portfolio risk analysis", goal:"Stress-test AI exposure", stage:"Assess concentration risk", next:"Define sleep-at-night threshold", g:65,l:60,r:82,t:54,c:84};
+      if(type==="cash") d = {intent:"Cash allocation", goal:"Decide what to do with $500", stage:"Clarify motivation", next:"Provide options", g:86,l:70,r:44,t:68,c:83};
+      if(type==="afford") d = {intent:"Affordability check", goal:"Avoid regret", stage:"Separate affordability from guilt", next:"Check impact on goals", g:68,l:72,r:48,t:66,c:79};
+
+      obs.intent.textContent = d.intent;
+      obs.goal.textContent = d.goal;
+      obs.stage.textContent = d.stage;
+      obs.nextStep.textContent = d.next;
+      obs.confBig.textContent = d.c + "%";
+      setBar("goal", d.g); setBar("liq", d.l); setBar("risk", d.r); setBar("tol", d.t); setBar("rec", d.c);
+    }
+
+    function setBar(name, val){
+      obs[name+"Val"].textContent = val + "%";
+      obs[name+"Bar"].style.width = val + "%";
+    }
+
+    function addMessage(role, text){
+      const row = document.createElement("div");
+      row.className = "msg-row " + (role === "user" ? "user" : "");
+      const now = role === "user" ? "10:43 AM" : "10:42 AM";
+
+      if(role === "ava"){
+        const av = document.createElement("div");
+        av.className = "avatar";
+        row.appendChild(av);
+      }
+
+      const bubble = document.createElement("div");
+      bubble.className = "message";
+      bubble.innerHTML = `<div class="msg-meta"><b>${role === "ava" ? "Ava" : "You"}</b>${now}</div>${escapeHtml(text)}`;
+      row.appendChild(bubble);
+      chat.appendChild(row);
+      row.scrollIntoView({behavior:"smooth", block:"end"});
+    }
+
+    function escapeHtml(str){
+      return str.replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll("\n","<br>");
+    }
+
+    function handleInput(text){
+      const clean = text.trim();
+      if(!clean) return;
+      addMessage("user", clean);
+      input.value = "";
+      transcript.textContent = "Ava is thinking...";
+
+      setTimeout(() => {
+        const type = classify(clean);
+        const response = replyFor(type);
+        addMessage("ava", response);
+        updateObs(type);
+        transcript.textContent = "Click the wave button to speak, or type your question.";
+        speak(response);
+      }, 260);
+    }
+
+    form.addEventListener("submit", e => {
+      e.preventDefault();
+      handleInput(input.value);
+    });
+
+    document.querySelectorAll(".suggestion").forEach(el => {
+      el.addEventListener("click", () => handleInput(el.dataset.prompt));
+    });
+
+    voiceMenu.addEventListener("click", e => {
+      voiceMenu.classList.toggle("open");
+      e.stopPropagation();
+    });
+    document.addEventListener("click", () => voiceMenu.classList.remove("open"));
+
+    voiceChoices.forEach(choice => {
+      choice.addEventListener("click", e => {
+        const key = choice.dataset.voiceKey;
+        selectedVoiceKey = key;
+        voiceLabel.textContent = choice.dataset.label;
+
+        voiceChoices.forEach(c => {
+          c.classList.remove("active");
+          const current = c.querySelector(".voice-current");
+          if(current) current.remove();
+        });
+        choice.classList.add("active");
+        choice.querySelector("div").insertAdjacentHTML("beforeend", '<span class="voice-current">Current voice</span>');
+
+        if(key === "Off"){
+          speechOn = false;
+          if(window.speechSynthesis) speechSynthesis.cancel();
+          if(speakerWave) speakerWave.style.display = "none";
+          e.stopPropagation();
+          return;
+        }
+
+        speechOn = true;
+        if(speakerWave) speakerWave.style.display = "";
+        pickVoiceByKey(key);
+        speak("Hi, I'm Ava. I'll help you make money decisions with confidence.");
+        e.stopPropagation();
+      });
+    });
+
+    function loadVoices(){
+      if(!window.speechSynthesis) return;
+      voices = speechSynthesis.getVoices();
+      pickVoiceByKey(selectedVoiceKey);
+    }
+
+    function pickVoiceByKey(key){
+      if(!voices.length) return;
+      const match = voices.find(v => 
+        v.name.toLowerCase().includes(key.toLowerCase()) && 
+        v.lang.toLowerCase().startsWith("en")
+      );
+      if(match) selectedVoiceName = match.name;
+      else {
+        const us = voices.find(v => v.lang === "en-US");
+        if(us) selectedVoiceName = us.name;
+      }
+    }
+
+    if(window.speechSynthesis){
+      loadVoices();
+      speechSynthesis.onvoiceschanged = loadVoices;
+    }
+
+    function speak(text){
+      if(!speechOn || !window.speechSynthesis) return;
+      const u = new SpeechSynthesisUtterance(text.replace(/\n+/g," "));
+      u.rate = .91;
+      u.pitch = .94;
+      const v = voices.find(x => x.name === selectedVoiceName);
+      if(v) u.voice = v;
+      speechSynthesis.cancel();
+      speechSynthesis.speak(u);
+    }
+
+    function setupSpeech(){
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if(!SR){
+        transcript.textContent = "Voice input works best in Chrome. Typing works everywhere.";
+        return;
+      }
+      recognition = new SR();
+      recognition.continuous = false;
+      recognition.interimResults = true;
+      recognition.lang = "en-US";
+
+      recognition.onstart = () => {
+        listening = true;
+        mic.classList.add("listening");
+        transcript.textContent = "Listening...";
+      };
+
+      recognition.onresult = e => {
+        let finalText = "";
+        let interim = "";
+        for(let i=e.resultIndex; i<e.results.length; i++){
+          const txt = e.results[i][0].transcript;
+          if(e.results[i].isFinal) finalText += txt;
+          else interim += txt;
+        }
+        const heard = finalText || interim;
+        input.value = heard;
+        transcript.textContent = heard ? `Heard: “${heard}”` : "Listening...";
+        if(finalText.trim()) setTimeout(() => handleInput(finalText), 160);
+      };
+
+      recognition.onend = () => {
+        listening = false;
+        mic.classList.remove("listening");
+      };
+
+      recognition.onerror = () => {
+        listening = false;
+        mic.classList.remove("listening");
+        transcript.textContent = "Could not access mic. You can type instead.";
+      };
+    }
+
+    mic.addEventListener("click", () => {
+      if(!recognition) return;
+      if(listening) recognition.stop();
+      else {
+        try { recognition.start(); }
+        catch { transcript.textContent = "Voice is starting. Try again in a second."; }
+      }
+    });
+
+    setupSpeech();
+  </script>
+</body>
+</html>
